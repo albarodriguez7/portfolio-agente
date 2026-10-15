@@ -8,8 +8,8 @@
    que se disimula atravesando la pantalla con un destello.
    ========================================================================== */
 import * as THREE from 'three';
-import { SCREEN } from './exterior.js?v=202610151846';
-import { CONTROL } from './control.js?v=202610151846';
+import { SCREEN } from './exterior.js?v=202610151853';
+import { CONTROL } from './control.js?v=202610151853';
 
 const v = (x, y, z) => new THREE.Vector3(x, y, z);
 const S = SCREEN;
@@ -20,7 +20,7 @@ export const KEYFRAMES = {
   'exterior-in': [
     { u: 0.0,  pos: v(4.4, 2.9, 6.4),        look: v(0, 1.45, 0),      shift: 1,   track: 'ext' },
     { u: 0.4,  pos: v(2.3, 2.25, 3.9),       look: v(0, 1.5, 0.2),     shift: 0.75, track: 'ext' },
-    { u: 0.78, pos: v(0.25, 1.62, 1.55),     look: v(0, S.y, 0.4),     shift: 0.08, track: 'ext' },
+    { u: 0.78, pos: v(0.25, 1.62, 1.55),     look: v(0, S.y, S.z),     shift: 0.08, track: 'ext' },
     { u: 1.0,  pos: v(0, S.y, S.z + 0.09),   look: v(0, S.y, -1),      shift: 0,   track: 'ext' }
   ],
   tokenizer: [
@@ -68,7 +68,7 @@ export const KEYFRAMES = {
     { u: 1.0,  pos: v(0, CONTROL.exit.y, CONTROL.exit.z + 0.12), look: v(0, CONTROL.exit.y, -450), shift: 0, track: 'in' }
   ],
   'exterior-out': [
-    { u: 0.0,  pos: v(0, S.y, S.z + 0.12),  look: v(0, S.y, 0),      shift: 0,   track: 'ext' },
+    { u: 0.0,  pos: v(0, S.y, S.z + 0.12),  look: v(0, S.y, S.z - 1), shift: 0,   track: 'ext' },
     { u: 0.3,  pos: v(0.2, 1.62, 1.7),      look: v(0, 1.5, 0),      shift: 0.3, track: 'ext' },
     { u: 0.75, pos: v(3.6, 2.7, 5.6),       look: v(0, 1.35, 0),     shift: 1,   track: 'ext' },
     { u: 1.0,  pos: v(4.6, 3.1, 6.8),       look: v(0, 1.35, 0),     shift: 1,   track: 'ext' }

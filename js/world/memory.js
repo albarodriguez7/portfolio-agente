@@ -5,7 +5,7 @@
    "checkpoints" que gira lentamente.
    ========================================================================== */
 import * as THREE from 'three';
-import { C, MONO, solid, neon, edges, canvasTexture, roundRect, label, smooth, mulberry } from './kit.js?v=202610151846';
+import { C, MONO, solid, neon, edges, canvasTexture, roundRect, label, smooth, mulberry } from './kit.js?v=202610151853';
 
 export const MEMORY = { center: new THREE.Vector3(0, 0, -236) };
 

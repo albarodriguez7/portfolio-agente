@@ -4,11 +4,11 @@
    pantalla. Al final salimos por la misma pantalla con la respuesta.
    ========================================================================== */
 import * as THREE from 'three';
-import { C, MONO, solid, neon, edges, canvasTexture, screenMesh, label, roundRect, wrapText, wrapLines, gridFloor, wireMountains, starfield, mulberry } from './kit.js?v=202610151846';
+import { C, MONO, solid, neon, edges, canvasTexture, screenMesh, label, roundRect, wrapText, wrapLines, gridFloor, wireMountains, starfield, mulberry } from './kit.js?v=202610151853';
 
 /* Medidas clave (en metros): la cámara entra justo por SCREEN */
 const DESK_Y = 0.81;
-export const SCREEN = new THREE.Vector3(0, 1.53, 0.41);
+export const SCREEN = new THREE.Vector3(0, 1.48, -0.218);   // pantalla del monitor (el chat)
 
 export function createExterior() {
   const group = new THREE.Group();
@@ -43,70 +43,132 @@ export function createExterior() {
     group.add(leg);
   }
 
-  /* ── Monitor (caja gruesa tipo CRT, como el del vídeo) ── */
-  const shell = solid(0xcfc3a6);
-  const stand = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.12, 0.5), shell);
-  stand.position.set(0, DESK_Y + 0.06, -0.1);
-  group.add(stand);
-  const body = new THREE.Mesh(new THREE.BoxGeometry(1.5, 1.18, 1.05), shell);
-  body.position.set(0, 1.505, -0.12);
-  group.add(body);
-  const back = new THREE.Mesh(new THREE.BoxGeometry(1.1, 0.85, 0.5), shell);
-  back.position.set(0, 1.5, -0.8);
-  group.add(back);
-  const bezel = new THREE.Mesh(new THREE.BoxGeometry(1.34, 1.0, 0.03), solid(0x2a2533));
-  bezel.position.set(0, SCREEN.y, 0.39);   // su cara queda detrás de la pantalla
-  group.add(bezel);
-  const led = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.03, 0.02), neon(C.green, 3));
-  led.position.set(0.6, 0.98, 0.41);
+  /* ── Setup real de Alba: monitor ancho + portátil en soporte + teclado y ratón ── */
+  const black = solid(0x15141c), graphite = solid(0x24232e);
+
+  // Monitor fino con su peana
+  const panel = new THREE.Mesh(new THREE.BoxGeometry(1.72, 1.0, 0.05), black);
+  panel.position.set(0, SCREEN.y, -0.25);
+  const neck = new THREE.Mesh(new THREE.BoxGeometry(0.07, 0.52, 0.06), graphite);
+  neck.position.set(0, DESK_Y + 0.28, -0.31);
+  const foot = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.025, 0.3), graphite);
+  foot.position.set(0, DESK_Y + 0.0125, -0.3);
+  group.add(panel, neck, foot);
+  const led = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.012, 0.01), neon(C.green, 3));
+  led.position.set(0.78, SCREEN.y - 0.47, -0.222);
   group.add(led);
 
-  // Pantalla con el chat (canvas que se redibuja)
-  const chat = canvasTexture(1024, 760);
-  const screen = screenMesh(1.24, 0.92, chat, 0.85);
+  // Barra de luz encima del monitor (la "ScreenLinear" de la foto)
+  const bar = new THREE.Mesh(new THREE.CylinderGeometry(0.028, 0.028, 1.0, 8), black);
+  bar.rotation.z = Math.PI / 2;
+  bar.position.set(0, SCREEN.y + 0.56, -0.19);
+  const barLight = new THREE.Mesh(new THREE.BoxGeometry(0.92, 0.008, 0.03), neon(0xfff1c7, 2.2));
+  barLight.position.set(0, SCREEN.y + 0.53, -0.18);
+  const lamp = new THREE.SpotLight(0xfff1c7, 6, 3, 0.9, 0.6, 1.4);
+  lamp.position.set(0, SCREEN.y + 0.52, -0.1);
+  lamp.target.position.set(0, DESK_Y, 0.45);
+  group.add(bar, barLight, lamp, lamp.target);
+
+  // Pantalla con el chat (canvas que se redibuja): por aquí entra la cámara
+  const chat = canvasTexture(1280, 720);
+  const screen = screenMesh(1.62, 0.91, chat, 0.85);
   screen.position.copy(SCREEN);
   group.add(screen);
 
   // Pósit en la esquina del monitor
-  const note = new THREE.Mesh(new THREE.PlaneGeometry(0.26, 0.26), new THREE.MeshBasicMaterial({
+  const note = new THREE.Mesh(new THREE.PlaneGeometry(0.22, 0.22), new THREE.MeshBasicMaterial({
     map: canvasTexture(128, 128, (ctx, w, h) => {
       ctx.fillStyle = '#fbbf24'; ctx.fillRect(0, 0, w, h);
       ctx.fillStyle = '#3b2a05'; ctx.font = `700 26px ${MONO}`;
       ctx.fillText('LLM', 16, 52); ctx.font = `500 20px ${MONO}`; ctx.fillText('+ tools', 16, 86);
     }).texture
   }));
-  note.position.set(0.62, 1.98, 0.43);
-  note.rotation.z = -0.12;
+  note.position.set(0.74, SCREEN.y + 0.4, -0.215);
+  note.rotation.z = -0.1;
   group.add(note);
 
-  /* ── Teclado con teclas de colores ── */
-  const kb = new THREE.Mesh(new THREE.BoxGeometry(1.25, 0.06, 0.42), shell);
-  kb.position.set(-0.05, DESK_Y + 0.03, 0.55);
-  kb.rotation.x = 0.05;
+  // Portátil sobre su soporte, a la izquierda, mostrando el propio portfolio
+  const laptop = new THREE.Group();
+  laptop.position.set(-1.28, DESK_Y + 0.22, -0.05);
+  laptop.rotation.set(0.22, 0.32, 0);
+  const lapBase = new THREE.Mesh(new THREE.BoxGeometry(0.82, 0.035, 0.56), black);
+  const keyBed = new THREE.InstancedMesh(new THREE.BoxGeometry(0.045, 0.012, 0.045), solid(0x2d2c38), 52);
+  const km = new THREE.Matrix4();
+  let ki = 0;
+  for (let r = 0; r < 4; r++) for (let c = 0; c < 13; c++) {
+    km.makeTranslation(-0.33 + c * 0.055, 0.022, -0.17 + r * 0.06);
+    keyBed.setMatrixAt(ki++, km);
+  }
+  const wasd = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.014, 0.1), solid(0xd8d8e0));  // teclas WASD claras
+  wasd.position.set(-0.2, 0.024, -0.05);
+  const pad2 = new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.004, 0.15), solid(0x1d1c26));
+  pad2.position.set(0, 0.02, 0.16);
+  const hinge = new THREE.Group();
+  hinge.position.set(0, 0.018, -0.28);
+  hinge.rotation.x = -0.22;                             // pantalla algo inclinada hacia atrás
+  const lid = new THREE.Mesh(new THREE.BoxGeometry(0.82, 0.52, 0.02), black);
+  lid.position.y = 0.26;
+  const mini = canvasTexture(640, 400);
+  const lapScreen = screenMesh(0.76, 0.46, mini, 0.9);
+  lapScreen.position.set(0, 0.27, 0.011);
+  hinge.add(lid, lapScreen);
+  laptop.add(lapBase, keyBed, wasd, pad2, hinge);
+  // soporte inclinado
+  const standPlate = new THREE.Mesh(new THREE.BoxGeometry(0.62, 0.02, 0.5), graphite);
+  standPlate.position.set(-1.28, DESK_Y + 0.12, -0.07);
+  standPlate.rotation.set(0.22, 0.32, 0);
+  const standLeg = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.2, 0.03), graphite);
+  standLeg.position.set(-1.2, DESK_Y + 0.1, -0.3);
+  standLeg.rotation.y = 0.32;
+  group.add(standPlate, standLeg, laptop);
+
+  // Miniatura del portfolio en la pantalla del portátil (easter egg recursivo)
+  function drawMini(ctx, w, h) {
+    ctx.fillStyle = '#05060d'; ctx.fillRect(0, 0, w, h);
+    ctx.fillStyle = '#0b0d1a'; ctx.fillRect(0, 0, w, 34);
+    ctx.fillStyle = '#fbbf24'; ctx.font = `700 18px ${MONO}`; ctx.fillText('alba:~/agent$', 14, 23);
+    ctx.fillRect(w - 86, 8, 72, 18);
+    // rejilla y montañas de alambre
+    ctx.strokeStyle = 'rgba(124,58,237,0.75)'; ctx.lineWidth = 1.5;
+    for (let i = 0; i < 9; i++) { ctx.beginPath(); ctx.moveTo(w * 0.42 + i * 34, 120); ctx.lineTo(w * 0.42 + i * 34 + 22, 70); ctx.lineTo(w * 0.42 + i * 34 + 44, 120); ctx.stroke(); }
+    for (let i = 0; i < 6; i++) { ctx.beginPath(); ctx.moveTo(w * 0.4, 260 + i * 24); ctx.lineTo(w, 250 + i * 26); ctx.stroke(); }
+    // escritorio con monitor en miniatura
+    ctx.fillStyle = '#bfa77c'; ctx.fillRect(w * 0.58, 230, 190, 12);
+    ctx.fillStyle = '#15141c'; ctx.fillRect(w * 0.64, 160, 110, 66);
+    ctx.fillStyle = '#22d3ee'; ctx.fillRect(w * 0.645, 165, 100, 56);
+    // panel de texto
+    ctx.strokeStyle = 'rgba(251,191,36,0.6)'; ctx.strokeRect(20, 60, w * 0.36, h - 90);
+    ctx.fillStyle = '#fbbf24'; ctx.font = `800 26px ${MONO}`; ctx.fillText('Alba', 34, 120); ctx.fillText('Rodríguez', 34, 150);
+    ctx.fillStyle = '#aeb3cc';
+    for (let i = 0; i < 5; i++) ctx.fillRect(34, 175 + i * 14, 170 - (i % 2) * 40, 6);
+    ctx.fillStyle = '#fbbf24'; ctx.fillRect(34, 270, 80, 22);
+  }
+  mini.redraw(drawMini);
+
+  /* ── Teclado plateado y ratón negro ── */
+  const kb = new THREE.Mesh(new THREE.BoxGeometry(1.12, 0.025, 0.34), solid(0xb4b8c1, { metalness: 0.4, roughness: 0.45 }));
+  kb.position.set(0.12, DESK_Y + 0.0125, 0.45);
   group.add(kb);
-  const keyGeo = new THREE.BoxGeometry(0.065, 0.03, 0.065);
-  const keys = new THREE.InstancedMesh(keyGeo, solid(0xf4efe4), 56);
+  const keys = new THREE.InstancedMesh(new THREE.BoxGeometry(0.045, 0.018, 0.045), solid(0x6b6f7c), 90);
   const m = new THREE.Matrix4();
   let k = 0;
-  for (let r = 0; r < 4; r++) for (let c = 0; c < 14; c++) {
-    m.makeTranslation(-0.05 - 0.55 + c * 0.0835, DESK_Y + 0.075, 0.42 + r * 0.085);
+  for (let r = 0; r < 5; r++) for (let c = 0; c < 18; c++) {
+    m.makeTranslation(0.12 - 0.5 + c * 0.059, DESK_Y + 0.032, 0.33 + r * 0.058);
     keys.setMatrixAt(k++, m);
   }
   group.add(keys);
-  const enter = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.035, 0.065), neon(C.amber, 1.4));
-  enter.position.set(0.5, DESK_Y + 0.08, 0.505);
+  const enter = new THREE.Mesh(new THREE.BoxGeometry(0.09, 0.02, 0.1), neon(C.amber, 1.3));
+  enter.position.set(0.12 + 0.18, DESK_Y + 0.034, 0.418);
   group.add(enter);
 
   /* ── Objetos del escritorio ── */
-  const mouse = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.06, 0.22), shell);
-  mouse.position.set(0.95, DESK_Y + 0.03, 0.6);
+  const mouse = new THREE.Mesh(new THREE.IcosahedronGeometry(1, 1), solid(0x1f2430));
+  mouse.scale.set(0.065, 0.04, 0.11);
+  mouse.position.set(1.0, DESK_Y + 0.03, 0.55);
   group.add(mouse);
-  const pad = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.01, 0.42), solid(0x2b2d42));
-  pad.position.set(0.95, DESK_Y + 0.005, 0.6);
-  group.add(pad);
 
   const mug = new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.1, 0.24, 8), solid(0xe11d48));
-  mug.position.set(-1.25, DESK_Y + 0.12, 0.35);
+  mug.position.set(0.95, DESK_Y + 0.12, -0.05);
   group.add(mug);
 
   const pot = new THREE.Mesh(new THREE.CylinderGeometry(0.17, 0.13, 0.26, 7), solid(0xb4532a));
