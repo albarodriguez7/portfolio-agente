@@ -5,9 +5,22 @@
    pasa, la herramienta "se ejecuta": haz de luz y el anillo pasa a verde.
    ========================================================================== */
 import * as THREE from 'three';
-import { C, MONO, solid, neon, neonLine, edges, canvasTexture, screenMesh, wrapText, smooth, gridFloor } from './kit.js?v=202610151820';
+import { C, MONO, solid, neon, neonLine, edges, canvasTexture, screenMesh, wrapText, smooth, gridFloor } from './kit.js?v=202610151839';
 
 export const WORKSHOP = { zStart: -262, zEnd: -312 };
+
+/* Texto STOP para la cara de la señal */
+let stopTex = null;
+function stopTexture() {
+  if (!stopTex) {
+    stopTex = canvasTexture(128, 128, (ctx, w, h) => {
+      ctx.fillStyle = '#dc2626'; ctx.fillRect(0, 0, w, h);
+      ctx.fillStyle = '#fff'; ctx.font = `800 34px ${MONO}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText('STOP', w / 2, h / 2 + 2);
+    }).texture;
+  }
+  return stopTex;
+}
 
 /* Objetos low-poly que representan cada proyecto */
 function makeIcon(id) {
@@ -29,20 +42,59 @@ function makeIcon(id) {
       cell.position.set(-0.3 + c * 0.2, 0.12 - r * 0.2, 0.09);
       g.add(cell);
     }
-  } else if (id === 'api') {                   // enchufe: API
-    const body = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.8, 0.5), solid(0x2a2540));
-    const p1 = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.35, 0.1), neon(C.amber, 2));
-    const p2 = p1.clone();
-    p1.position.set(-0.15, 0.55, 0);
-    p2.position.set(0.15, 0.55, 0);
-    g.add(body, p1, p2);
-  } else if (id === 'ml') {                    // árbol de decisión
-    const pts = [[0, 0.5], [-0.45, 0], [0.45, 0], [-0.7, -0.5], [-0.2, -0.5], [0.2, -0.5], [0.7, -0.5]];
-    pts.forEach(([x, y]) => { const n = new THREE.Mesh(new THREE.IcosahedronGeometry(0.12, 0), neon(C.violet, 2)); n.position.set(x, y, 0); g.add(n); });
-    const lines = [[0, 1], [0, 2], [1, 3], [1, 4], [2, 5], [2, 6]].flatMap(([a, b]) => [pts[a][0], pts[a][1], 0, pts[b][0], pts[b][1], 0]);
-    const lg = new THREE.BufferGeometry();
-    lg.setAttribute('position', new THREE.Float32BufferAttribute(lines, 3));
-    g.add(new THREE.LineSegments(lg, neonLine(C.cyan, 1.6)));
+  } else if (id === 'api') {                   // semáforo: la API responde en tiempo real
+    const box = new THREE.Mesh(new THREE.BoxGeometry(0.42, 1.0, 0.32), solid(0x1f1d2b));
+    const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 0.7, 6), solid(0x3b3850));
+    pole.position.y = -0.85;
+    g.add(box, pole);
+    const colors = [C.red, C.amber, C.green];
+    const lights = colors.map((col, i) => {
+      const on = neon(col, 2.6), off = new THREE.MeshBasicMaterial({ color: new THREE.Color(col).multiplyScalar(0.18) });
+      // luces por las dos caras (el objeto gira) con su visera
+      const meshes = [1, -1].map(side => {
+        const l = new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.11, 0.36, 10), off);
+        l.rotation.x = Math.PI / 2;
+        l.position.set(0, 0.3 - i * 0.3, 0);
+        const visor = new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.03, 0.12), solid(0x1f1d2b));
+        visor.position.set(0, 0.42 - i * 0.3, side * 0.22);
+        g.add(visor);
+        return l;
+      });
+      g.add(meshes[0]);
+      return { mesh: meshes[0], on, off };
+    });
+    // ciclo rojo → verde → ámbar
+    g.userData.tick = time => {
+      const phase = Math.floor(time / 1.2) % 3;
+      const active = [0, 2, 1][phase];
+      lights.forEach((l, i) => { l.mesh.material = i === active ? l.on : l.off; });
+    };
+  } else if (id === 'ml') {                    // coche y señal de stop: predecir infracciones
+    const car = new THREE.Group();
+    const body = new THREE.Mesh(new THREE.BoxGeometry(0.95, 0.26, 0.46), solid(0x2563eb));
+    const cabin = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.22, 0.42), solid(0x93c5fd));
+    cabin.position.set(-0.06, 0.24, 0);
+    car.add(body, cabin);
+    [[-0.3, 0.24], [0.3, 0.24], [-0.3, -0.24], [0.3, -0.24]].forEach(([x, z]) => {
+      const w = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 0.08, 10), solid(0x111018));
+      w.rotation.x = Math.PI / 2;
+      w.position.set(x, -0.14, z);
+      car.add(w);
+    });
+    const head = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.06, 0.32), neon(C.amber, 2.2));
+    head.position.set(0.48, 0.02, 0);
+    car.add(head);
+    car.position.set(-0.15, -0.45, 0);
+    // señal de stop (octógono rojo con texto)
+    const sign = new THREE.Group();
+    const post = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.9, 6), solid(0xd4d4d8));
+    const plate = new THREE.Mesh(new THREE.CylinderGeometry(0.26, 0.26, 0.04, 8),
+      [solid(0xdc2626), new THREE.MeshBasicMaterial({ map: stopTexture(), toneMapped: false }), solid(0xdc2626)]);
+    plate.rotation.set(Math.PI / 2, Math.PI / 8, 0);
+    plate.position.y = 0.55;
+    sign.add(post, plate);
+    sign.position.set(0.55, -0.1, -0.1);
+    g.add(car, sign);
   } else {                                     // casa: Airbnb
     const body = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.6, 0.7), solid(0xf5e6c8));
     const roof = new THREE.Mesh(new THREE.ConeGeometry(0.68, 0.5, 4), solid(0xe11d48));
@@ -89,7 +141,8 @@ export function createWorkshop() {
       root.add(ped, ring, edges(ped.geometry, C.grid, 1).translateY(0.65));
 
       const icon = makeIcon(tool.id);
-      icon.scale.setScalar(scale * 1.1);
+      // los objetos de tráfico tienen más detalle: un poco más grandes
+      icon.scale.setScalar(scale * (tool.id === 'api' || tool.id === 'ml' ? 1.45 : 1.1));
       icon.position.y = 2.4;
       root.add(icon);
 
@@ -142,6 +195,7 @@ export function createWorkshop() {
         // la herramienta se ejecuta cuando su tarjeta llega a la zona de lectura
         const k = marks.length ? smooth(0, 1, marks[i] ?? 0) : smooth(s.z + 9, s.z + 2, camera.position.z);
         s.icon.rotation.y = time * (0.6 + k * 2.2) + i;
+        if (s.icon.userData.tick) s.icon.userData.tick(time);
         s.icon.position.y = 2.4 + Math.sin(time * 1.5 + i) * 0.12 + k * 0.3;
         s.ringMat.color.copy(amber).lerp(green, k);
         s.beam.material.opacity = k * (0.18 + Math.sin(time * 6) * 0.04);

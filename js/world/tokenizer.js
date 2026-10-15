@@ -5,7 +5,7 @@
    el texto se convierte en vectores.
    ========================================================================== */
 import * as THREE from 'three';
-import { C, MONO, solid, neon, edges, canvasTexture, roundRect, smooth, clamp } from './kit.js?v=202610151820';
+import { C, MONO, solid, neon, edges, canvasTexture, roundRect, smooth, clamp } from './kit.js?v=202610151839';
 
 export const TOKENIZER = { zStart: -98, zEnd: -152 };
 

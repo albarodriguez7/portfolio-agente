@@ -33,7 +33,7 @@
   /* Descarga (una sola vez) el JSON de un idioma */
   async function load(l) {
     if (!cache[l]) {
-      const res = await fetch(`data/content.${l}.json?v=202610151820`);
+      const res = await fetch(`data/content.${l}.json?v=202610151839`);
       if (!res.ok) throw new Error(`No se pudo cargar data/content.${l}.json (${res.status})`);
       cache[l] = await res.json();
     }
