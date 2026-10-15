@@ -12,7 +12,7 @@ Portfolio de **Alba Rodríguez — Junior AI Engineer** en forma de recorrido 3D
 | 2 | Túnel del tokenizador: el mensaje se rompe en tokens | — | Frase |
 | 3 | El LLM por dentro: capas de neuronas y pulsos de atención | `agent` | Sobre mí |
 | 4 | Núcleo de decisión | — | Frase |
-| 5 | Historial de checkpoints: una línea de luz con un punto y una ficha por etapa; Marketing llega por una rama que se une en el bootcamp, y la actualidad es HEAD | `state` | Formación |
+| 5 | Estantería de biblioteca: un libro por etapa (título en el lomo) que sale y se ilumina al leerla; birrete y lámpara | `state` | Formación |
 | 6 | Taller: un pedestal por proyecto que se «ejecuta» al pasar | `tools` | Proyectos |
 | 7 | Índice del retriever: 4 fichas de cristal (una por categoría) que un haz lee una a una | `retriever` | Stack |
 | 8 | 2 vallas láser que se abren y se vuelven verdes (resumen de las reglas) | `guardrails` | Principios |

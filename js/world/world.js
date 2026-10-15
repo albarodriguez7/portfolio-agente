@@ -9,16 +9,16 @@ import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 
-import { C, gridFloor, starfield, lerp } from './kit.js?v=202610151927';
-import { createExterior } from './exterior.js?v=202610151927';
-import { createTokenizer } from './tokenizer.js?v=202610151927';
-import { createBrain } from './brain.js?v=202610151927';
-import { createMemory } from './memory.js?v=202610151927';
-import { createWorkshop } from './workshop.js?v=202610151927';
-import { createVectors } from './vectors.js?v=202610151927';
-import { createGates } from './gates.js?v=202610151927';
-import { createControl } from './control.js?v=202610151927';
-import { createJourney } from './journey.js?v=202610151927';
+import { C, gridFloor, starfield, lerp } from './kit.js?v=202610152051';
+import { createExterior } from './exterior.js?v=202610152051';
+import { createTokenizer } from './tokenizer.js?v=202610152051';
+import { createBrain } from './brain.js?v=202610152051';
+import { createMemory } from './memory.js?v=202610152051';
+import { createWorkshop } from './workshop.js?v=202610152051';
+import { createVectors } from './vectors.js?v=202610152051';
+import { createGates } from './gates.js?v=202610152051';
+import { createControl } from './control.js?v=202610152051';
+import { createJourney } from './journey.js?v=202610152051';
 
 export function webglAvailable() {
   try {

@@ -1,97 +1,132 @@
 /* ==========================================================================
-   memory.js — La memoria del agente (nodo state) como historial de checkpoints
-   Una línea de luz (la rama principal) con un punto por etapa de la
-   formación y su ficha de cristal al lado. Marketing y Publicidad llega por
-   una rama aparte que se une a la principal en el bootcamp; la etapa actual
-   lleva la etiqueta HEAD. Cada checkpoint se enciende cuando se lee su texto.
+   memory.js — Formación (nodo state): una estantería de biblioteca
+   Cada etapa de la formación es un libro con su título en el lomo:
+   Marketing y Publicidad y el Bootcamp en la balda de abajo; los módulos y
+   la etapa actual en la de arriba. Cuando se lee su texto, el libro sale un
+   poco de la estantería y su lomo se ilumina. Encima, un birrete; al lado,
+   una lámpara de pie. Pocos elementos, luz cálida y tranquila.
    ========================================================================== */
 import * as THREE from 'three';
-import { C, MONO, neon, neonLine, canvasTexture, roundRect, smooth, clamp } from './kit.js?v=202610151927';
+import { C, MONO, solid, canvasTexture, smooth } from './kit.js?v=202610152051';
 
-// Profundidad (z) de cada checkpoint: anterior, bootcamp, módulos 1-3 y actualidad
-export const CHECKPOINTS_Z = [-216, -223, -230, -237, -244, -251];
-const LINE_X = 1.4, LINE_Y = -1.2, CARD_X = 3.9, CARD_Y = 0.5;
-const BRANCH_X = 2.8;
+// Estantería centrada en SHELF, con el frente mirando hacia +z (hacia la cámara)
+export const SHELF = new THREE.Vector3(1.5, 0, -232);
+const W = 5.4, H = 3.6, D = 0.8;               // ancho, alto y fondo de la estantería
+const SHELVES_Y = [-1.25, 0.45];                // altura de la cara superior de cada balda
 
-export const MEMORY = { center: new THREE.Vector3(1.5, 0, -234) };
+// Libros con etapa (índice de bloque de texto) y relleno; x relativa al centro
+const BOOKS = [
+  // balda de abajo
+  { shelf: 0, x: -2.2, w: 0.42, h: 1.25, color: 0x6d5bd0, stage: 0 },   // Marketing y Publicidad
+  { shelf: 0, x: -1.72, w: 0.18, h: 1.0, color: 0x4b4a5c },
+  { shelf: 0, x: -1.5, w: 0.2, h: 1.1, color: 0x6b5b4a },
+  { shelf: 0, x: -0.95, w: 0.62, h: 1.4, color: 0x0e7490, stage: 1 },   // Bootcamp (libro gordo)
+  { shelf: 0, x: -0.4, w: 0.2, h: 1.05, color: 0x3f4a5c, tilt: -0.22 },
+  // balda de arriba
+  { shelf: 1, x: -2.15, w: 0.2, h: 0.88, color: 0x5a4b6b, tilt: 0.18 },
+  { shelf: 1, x: -1.7, w: 0.42, h: 1.02, color: 0x0891b2, stage: 2 },    // Módulo 1
+  { shelf: 1, x: -1.18, w: 0.42, h: 1.06, color: 0x0e7490, stage: 3 },   // Módulo 2
+  { shelf: 1, x: -0.66, w: 0.42, h: 1.0, color: 0x155e75, stage: 4 },   // Módulo 3
+  { shelf: 1, x: -0.25, w: 0.16, h: 0.84, color: 0x4b4a5c },
+  { shelf: 1, x: 0.3, w: 0.46, h: 1.06, color: 0xb45309, stage: 5 }      // IA generativa (actual)
+];
 
 export function createMemory() {
   const group = new THREE.Group();
   group.name = 'memory';
-  group.add(new THREE.HemisphereLight(0xb7a9ff, 0x0a0614, 0.8));
+  group.position.copy(SHELF);
 
-  /* ── Rama principal: tramo apagado + tramo encendido que crece con la lectura ── */
-  const zStart = CHECKPOINTS_Z[1] + 2, zEnd = CHECKPOINTS_Z[5] - 4;
-  const len = zStart - zEnd;
-  const rail = new THREE.Mesh(new THREE.BoxGeometry(0.035, 0.035, len), new THREE.MeshBasicMaterial({ color: 0x2b2550 }));
-  rail.position.set(LINE_X, LINE_Y, (zStart + zEnd) / 2);
-  const lit = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.03, 1), neon(C.cyan, 0.9));
-  lit.position.set(LINE_X, LINE_Y, zStart);
-  group.add(rail, lit);
+  // Luz cálida y suave (la de la lámpara) + relleno tenue
+  group.add(new THREE.HemisphereLight(0xc9bfff, 0x120a1e, 0.55));
+  const lampLight = new THREE.PointLight(0xffd6a0, 9, 9, 1.6);
+  lampLight.position.set(-3.6, 1.6, 1.4);
+  group.add(lampLight);
 
-  /* ── Rama de Marketing que se une a la principal en el bootcamp ── */
-  const branchCurve = new THREE.CatmullRomCurve3([
-    new THREE.Vector3(BRANCH_X, LINE_Y, CHECKPOINTS_Z[0] + 5),
-    new THREE.Vector3(BRANCH_X, LINE_Y, CHECKPOINTS_Z[0]),
-    new THREE.Vector3(BRANCH_X - 0.4, LINE_Y, CHECKPOINTS_Z[0] - 4),
-    new THREE.Vector3(LINE_X, LINE_Y, CHECKPOINTS_Z[1])
-  ]);
-  group.add(new THREE.Mesh(new THREE.TubeGeometry(branchCurve, 40, 0.018, 5, false), neon(C.violet, 0.8)));
+  /* ── Estantería de madera ── */
+  const wood = solid(0x7a5536), woodDark = solid(0x5c3f28);
+  const back = new THREE.Mesh(new THREE.BoxGeometry(W, H, 0.06), woodDark);
+  back.position.set(0, (H / 2) - 1.95, -D / 2);
+  group.add(back);
+  for (const x of [-W / 2, W / 2]) {
+    const side = new THREE.Mesh(new THREE.BoxGeometry(0.12, H, D), wood);
+    side.position.set(x, H / 2 - 1.95, 0);
+    group.add(side);
+  }
+  for (const y of [-1.95, ...SHELVES_Y, H - 1.95]) {
+    const board = new THREE.Mesh(new THREE.BoxGeometry(W, 0.1, D), wood);
+    board.position.set(0, y - 0.05, 0);
+    group.add(board);
+  }
 
-  /* ── Checkpoints: punto + conector + ficha ── */
-  const items = CHECKPOINTS_Z.map((z, i) => {
-    const onBranch = i === 0;
-    const nx = onBranch ? BRANCH_X : LINE_X;
-    const node = new THREE.Mesh(new THREE.IcosahedronGeometry(i === 5 ? 0.2 : 0.14, 1), new THREE.MeshBasicMaterial({ color: 0x3a335e, toneMapped: false }));
-    node.position.set(nx, LINE_Y, z);
-    const conn = new THREE.Line(new THREE.BufferGeometry().setFromPoints([
-      new THREE.Vector3(nx, LINE_Y, z), new THREE.Vector3(CARD_X - 1.6, CARD_Y - 0.4, z)
-    ]), neonLine(C.grid, 0.9, { transparent: true, opacity: 0.4 }));
-    group.add(node, conn);
+  /* ── Birrete encima de la estantería ── */
+  const cap = new THREE.Group();
+  const capTop = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.05, 0.9), solid(0x1f1d2b));
+  capTop.rotation.y = Math.PI / 4;
+  const capBase = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.32, 0.22, 8), solid(0x1f1d2b));
+  capBase.position.y = -0.13;
+  const tassel = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.35, 0.03), solid(0xfbbf24));
+  tassel.position.set(0.42, -0.17, 0);
+  cap.add(capTop, capBase, tassel);
+  cap.position.set(1.4, H - 1.95 + 0.3, 0.05);
+  cap.rotation.y = 0.35;
+  group.add(cap);
 
-    const card = new THREE.Group();
-    card.position.set(CARD_X, CARD_Y, z);
-    card.lookAt(-2.5, 1.0, z + 7);                     // mira hacia el pasillo de la cámara
-    const glass = new THREE.Mesh(new THREE.PlaneGeometry(3.2, 1.47), new THREE.MeshBasicMaterial({ color: 0x0a0c1c, transparent: true, opacity: 0.85, side: THREE.DoubleSide }));
-    const tex = canvasTexture(640, 294);
-    const face = new THREE.Mesh(new THREE.PlaneGeometry(3.2, 1.47), new THREE.MeshBasicMaterial({ map: tex.texture, transparent: true, toneMapped: false }));
-    face.position.z = 0.01;
-    const frameMat = neonLine(onBranch ? C.violet : i === 5 ? C.amber : C.cyan, 1.0, { transparent: true });
-    const frame = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.PlaneGeometry(3.2, 1.47)), frameMat);
-    frame.position.z = 0.02;
-    card.add(glass, face, frame);
-    group.add(card);
+  /* ── Lámpara de pie ── */
+  const lamp = new THREE.Group();
+  const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 3.2, 6), solid(0x2a2833));
+  pole.position.y = -0.35;
+  const foot = new THREE.Mesh(new THREE.CylinderGeometry(0.32, 0.36, 0.06, 10), solid(0x2a2833));
+  foot.position.y = -1.92;
+  const shade = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.42, 0.45, 10, 1, true), new THREE.MeshStandardMaterial({ color: 0xf3e3c3, emissive: 0xffc98a, emissiveIntensity: 0.55, side: THREE.DoubleSide, flatShading: true }));
+  shade.position.y = 1.35;
+  lamp.add(pole, foot, shade);
+  lamp.position.set(-3.6, 0, 1.1);
+  group.add(lamp);
 
-    // Etiqueta HEAD sobre el último checkpoint
-    let head = null;
-    if (i === 5) {
-      const ht = canvasTexture(256, 80, ctx => {
-        ctx.fillStyle = '#fbbf24'; roundRect(ctx, 2, 2, 252, 76, 14); ctx.fill();
-        ctx.fillStyle = '#1a1405'; ctx.font = `800 34px ${MONO}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-        ctx.fillText('HEAD → main', 128, 42);
-      });
-      head = new THREE.Mesh(new THREE.PlaneGeometry(0.9, 0.28), new THREE.MeshBasicMaterial({ map: ht.texture, transparent: true, toneMapped: false }));
-      head.position.set(-1.05, 0.95, 0.02);
-      card.add(head);
+  /* ── Libros ── */
+  const books = BOOKS.map(def => {
+    const book = new THREE.Group();
+    const baseY = SHELVES_Y[def.shelf] + def.h / 2;
+    const depth = 0.62;
+    const body = new THREE.Mesh(new THREE.BoxGeometry(def.w, def.h, depth), solid(def.color));
+    book.add(body);
+    // tapa de páginas (color papel) visible por arriba
+    const pages = new THREE.Mesh(new THREE.BoxGeometry(def.w * 0.82, 0.012, depth * 0.94), solid(0xefe6d2));
+    pages.position.y = def.h / 2 + 0.002;
+    book.add(pages);
+    let spine = null, tex = null;
+    if (def.stage != null) {
+      tex = canvasTexture(Math.round(def.w * 220), Math.round(def.h * 220));
+      spine = new THREE.Mesh(new THREE.PlaneGeometry(def.w * 0.92, def.h * 0.94), new THREE.MeshBasicMaterial({ map: tex.texture, transparent: true, toneMapped: false }));
+      spine.position.z = depth / 2 + 0.004;
+      book.add(spine);
     }
-    return { z, node, card, tex, face, glass, frameMat, onBranch, head, index: i };
+    book.position.set(def.x, baseY, 0.04);
+    if (def.tilt) { book.rotation.z = def.tilt; book.position.x += def.tilt * 0.4; book.position.y -= Math.abs(def.tilt) * 0.08; }
+    group.add(book);
+    return { ...def, book, spine, tex, baseZ: 0.04 };
   });
+  const staged = books.filter(b => b.stage != null).sort((a, b) => a.stage - b.stage);
 
-  const dim = new THREE.Color(0x3a335e);
-  const on = { branch: new THREE.Color(C.violet).multiplyScalar(1.3), main: new THREE.Color(C.cyan).multiplyScalar(1.3), head: new THREE.Color(C.amber).multiplyScalar(1.4) };
-
-  function draw(item, kicker, title, foot) {
-    const accent = item.onBranch ? '#c4b5fd' : item.index === 5 ? '#fcd34d' : '#67e8f9';
-    item.tex.redraw((ctx, w, h) => {
+  // Texto vertical en el lomo: etiqueta pequeña + título
+  function drawSpine(b, kicker, title) {
+    b.tex.redraw((ctx, w, h) => {
+      const accent = b.stage === 5 ? '#fde68a' : b.stage === 0 ? '#ddd6fe' : '#cffafe';
+      // bandas decorativas arriba y abajo
+      ctx.fillStyle = 'rgba(255,255,255,0.22)';
+      ctx.fillRect(0, 18, w, 6); ctx.fillRect(0, h - 24, w, 6);
+      ctx.save();
+      ctx.translate(w / 2, h / 2);
+      ctx.rotate(-Math.PI / 2);
+      ctx.textAlign = 'center';
+      ctx.fillStyle = '#ffffff';
+      const big = Math.min(w * 0.36, 34);
+      ctx.font = `800 ${big}px ${MONO}`;
+      ctx.fillText(title, 0, -w * 0.02, h * 0.86);
       ctx.fillStyle = accent;
-      ctx.font = `600 26px ${MONO}`;
-      ctx.fillText(kicker, 30, 74, w - 60);
-      ctx.fillStyle = '#f5f3ff';
-      ctx.font = `800 40px ${MONO}`;
-      ctx.fillText(title, 30, 142, w - 60);
-      ctx.fillStyle = '#8c92ad';
-      ctx.font = `500 22px ${MONO}`;
-      ctx.fillText(foot, 30, h - 34, w - 60);
+      ctx.font = `600 ${Math.round(big * 0.62)}px ${MONO}`;
+      ctx.fillText(kicker, 0, w * 0.3, h * 0.86);
+      ctx.restore();
     });
   }
 
@@ -101,28 +136,17 @@ export function createMemory() {
     setContent(c) {
       const s = c.state;
       const plain = html => { const d = document.createElement('div'); d.innerHTML = html; return d.textContent; };
-      draw(items[0], plain(s.previous.dates), plain(s.previous.name), 'branch: marketing');
-      draw(items[1], 'The Bridge · ' + plain(s.bootcamp.dates), plain(s.bootcamp.short || s.bootcamp.name), 'merge → main · checkpoint_1');
-      s.messages.slice(0, 4).forEach((m, i) => draw(items[2 + i], plain(m.role), plain(m.title), `checkpoint_${i + 2}`));
+      drawSpine(staged[0], plain(s.previous.dates), plain(s.previous.name));
+      drawSpine(staged[1], 'The Bridge · ' + plain(s.bootcamp.dates), plain(s.bootcamp.short || s.bootcamp.name));
+      s.messages.slice(0, 4).forEach((m, i) => drawSpine(staged[2 + i], plain(m.role).split(' · ')[0], plain(m.title)));
     },
     update(time, { u, marks = [] }) {
-      // progreso de cada checkpoint: sus marcas de lectura (o el avance de la sección)
-      const k = items.map((_, i) => marks.length ? smooth(0, 1, marks[i] ?? 0) : smooth(i / 7, i / 7 + 0.12, u));
-      items.forEach((it, i) => {
-        const v = k[i];
-        it.node.material.color.copy(dim).lerp(it.onBranch ? on.branch : i === 5 ? on.head : on.main, v);
-        it.face.material.opacity = 0.18 + 0.82 * v;
-        it.glass.material.opacity = 0.35 + 0.5 * v;
-        it.frameMat.opacity = 0.2 + 0.8 * v;
-        it.card.position.y = CARD_Y - (1 - v) * 0.25;
-        if (it.head) it.head.material.opacity = v;
+      staged.forEach((b, i) => {
+        const k = marks.length ? smooth(0, 1, marks[i] ?? 0) : smooth(i / 7, i / 7 + 0.12, u);
+        b.book.position.z = b.baseZ + k * 0.4;               // el libro sale de la estantería
+        b.spine.material.color.setScalar(0.55 + 0.45 * k);   // y su lomo se ilumina con suavidad
       });
-      // la rama principal se enciende hasta el último checkpoint leído
-      let reach = 0;
-      for (let i = 1; i < items.length; i++) reach = Math.max(reach, (i - 1 + k[i]) / (items.length - 2));
-      const litLen = Math.max(0.001, clamp(reach) * (zStart - CHECKPOINTS_Z[5]));
-      lit.scale.z = litLen;
-      lit.position.z = zStart - litLen / 2;
+      cap.position.y = H - 1.95 + 0.3 + Math.sin(time * 0.8) * 0.02;
     }
   };
 }

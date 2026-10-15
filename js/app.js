@@ -6,7 +6,7 @@
    4. Interacciones: herramientas, stack ↔ estrellas 3D, copiar email,
       navegación por anclas
    ========================================================================== */
-import { createWorld, webglAvailable } from './world/world.js?v=202610151927';
+import { createWorld, webglAvailable } from './world/world.js?v=202610152051';
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));

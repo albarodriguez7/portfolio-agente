@@ -5,7 +5,7 @@
    en el centro, la pantalla final_answer por la que salimos del agente.
    ========================================================================== */
 import * as THREE from 'three';
-import { C, MONO, solid, neon, edges, canvasTexture, screenMesh, roundRect, wrapText, gridFloor, smooth, clamp, mulberry } from './kit.js?v=202610151927';
+import { C, MONO, solid, neon, edges, canvasTexture, screenMesh, roundRect, wrapText, gridFloor, smooth, clamp, mulberry } from './kit.js?v=202610152051';
 
 // La sala se construye en coordenadas propias y se acerca SHIFT metros al pasillo
 const SHIFT = 50;
