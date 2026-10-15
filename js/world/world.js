@@ -9,16 +9,16 @@ import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 
-import { C, gridFloor, starfield, lerp } from './kit.js?v=202610151839';
-import { createExterior } from './exterior.js?v=202610151839';
-import { createTokenizer } from './tokenizer.js?v=202610151839';
-import { createBrain } from './brain.js?v=202610151839';
-import { createMemory } from './memory.js?v=202610151839';
-import { createWorkshop } from './workshop.js?v=202610151839';
-import { createVectors } from './vectors.js?v=202610151839';
-import { createGates } from './gates.js?v=202610151839';
-import { createControl } from './control.js?v=202610151839';
-import { createJourney } from './journey.js?v=202610151839';
+import { C, gridFloor, starfield, lerp } from './kit.js?v=202610151846';
+import { createExterior } from './exterior.js?v=202610151846';
+import { createTokenizer } from './tokenizer.js?v=202610151846';
+import { createBrain } from './brain.js?v=202610151846';
+import { createMemory } from './memory.js?v=202610151846';
+import { createWorkshop } from './workshop.js?v=202610151846';
+import { createVectors } from './vectors.js?v=202610151846';
+import { createGates } from './gates.js?v=202610151846';
+import { createControl } from './control.js?v=202610151846';
+import { createJourney } from './journey.js?v=202610151846';
 
 export function webglAvailable() {
   try {
@@ -185,7 +185,7 @@ export function createWorld({ canvas, sections, reduced, lowPower, scrollMax, an
   resize();
 
   return {
-    renderer, camera, journey, modules,
+    renderer, camera, journey, modules, scene,
     resize, setContent, setScroll, start, stop,
     renderOnce() { frame(performance.now()); },
     jump(t) { tTarget = tNow = t; },

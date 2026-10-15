@@ -8,8 +8,8 @@
    que se disimula atravesando la pantalla con un destello.
    ========================================================================== */
 import * as THREE from 'three';
-import { SCREEN } from './exterior.js?v=202610151839';
-import { CONTROL } from './control.js?v=202610151839';
+import { SCREEN } from './exterior.js?v=202610151846';
+import { CONTROL } from './control.js?v=202610151846';
 
 const v = (x, y, z) => new THREE.Vector3(x, y, z);
 const S = SCREEN;

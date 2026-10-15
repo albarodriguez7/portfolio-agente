@@ -4,7 +4,7 @@
    pantalla. Al final salimos por la misma pantalla con la respuesta.
    ========================================================================== */
 import * as THREE from 'three';
-import { C, MONO, solid, neon, edges, canvasTexture, screenMesh, label, roundRect, wrapText, wrapLines, gridFloor, wireMountains, starfield, mulberry } from './kit.js?v=202610151839';
+import { C, MONO, solid, neon, edges, canvasTexture, screenMesh, label, roundRect, wrapText, wrapLines, gridFloor, wireMountains, starfield, mulberry } from './kit.js?v=202610151846';
 
 /* Medidas clave (en metros): la cámara entra justo por SCREEN */
 const DESK_Y = 0.81;
@@ -127,6 +127,12 @@ export function createExterior() {
     b.rotation.y = (i - 1) * 0.15;
     group.add(b);
   });
+
+  /* ── Easter egg: la perra de Alba tumbada en su cama, junto a la mesa ── */
+  const dog = createDog();
+  dog.group.position.set(-2.75, 0, 0.6);
+  dog.group.rotation.y = 0.75;                 // mira hacia la cámara inicial
+  group.add(dog.group);
 
   /* ── Torre de GPU con LEDs junto a la mesa ── */
   const tower = new THREE.Mesh(new THREE.BoxGeometry(0.55, 1.25, 1.1), solid(0x1d1b2b));
@@ -254,6 +260,7 @@ export function createExterior() {
     setMode(next) { if (next !== mode) { mode = next; lastDraw = 0; } },
     update(time) {
       // LEDs que parpadean
+      dog.update(time);
       towerLeds.forEach((l, i) => { l.visible = Math.sin(time * 3 + i * 1.7) > -0.6; });
       rackLeds.forEach((l, i) => { l.visible = Math.sin(time * (1.5 + (i % 5) * 0.7) + i) > -0.3; });
       // la pantalla se redibuja ~12 veces por segundo
@@ -261,6 +268,110 @@ export function createExterior() {
         lastDraw = time;
         chat.redraw((ctx, w, h) => drawChat(ctx, w, h, time));
       }
+    }
+  };
+}
+
+/* ==========================================================================
+   Perra low-poly (inspirada en una foto): pelo canela, pecho, hocico y mancha
+   de la frente blancos, orejas caídas, collar gris con chapa y patas blancas.
+   Tumbada en su cama gris con una mantita. Respira y mueve el rabo.
+   ========================================================================== */
+function createDog() {
+  const g = new THREE.Group();
+  const tan = solid(0xc98a4e), tanDark = solid(0xa8683a), white = solid(0xf3ece4);
+  const ell = (rx, ry, rz, mat, x, y, z) => {
+    const m = new THREE.Mesh(new THREE.IcosahedronGeometry(1, 1), mat);
+    m.scale.set(rx, ry, rz);
+    m.position.set(x, y, z);
+    return m;
+  };
+
+  // Cama ovalada con borde acolchado y mantita
+  const bed = new THREE.Group();
+  const base = new THREE.Mesh(new THREE.CylinderGeometry(0.8, 0.82, 0.12, 12), solid(0x55545f));
+  base.position.y = 0.06;
+  const rim = new THREE.Mesh(new THREE.TorusGeometry(0.74, 0.14, 6, 14), solid(0x6b6a76));
+  rim.rotation.x = Math.PI / 2;
+  rim.position.y = 0.16;
+  bed.add(base, rim);
+  bed.scale.z = 0.85;
+  const blanket = ell(0.5, 0.16, 0.34, solid(0x8e88a6), -0.2, 0.22, -0.42);
+  blanket.rotation.y = 0.5;
+  g.add(bed, blanket);
+
+  const dog = new THREE.Group();
+  dog.position.y = 0.12;
+  g.add(dog);
+
+  // Cuerpo tumbado (la cabeza mira hacia +z)
+  const body = new THREE.Group();
+  body.add(
+    ell(0.27, 0.22, 0.42, tan, 0, 0.22, -0.12),        // tronco
+    ell(0.26, 0.22, 0.24, tan, 0.06, 0.2, -0.46),      // cuartos traseros
+    ell(0.12, 0.13, 0.08, white, 0, 0.25, 0.24)         // pecho blanco
+  );
+  dog.add(body);
+
+  // Patas delanteras estiradas con las puntas blancas
+  [-0.11, 0.11].forEach((x, i) => {
+    const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.055, 0.06, 0.38, 6), tan);
+    leg.rotation.x = Math.PI / 2;
+    leg.position.set(x, 0.07, 0.36 + i * 0.04);
+    const paw = ell(0.07, 0.05, 0.08, white, x, 0.06, 0.58 + i * 0.04);
+    dog.add(leg, paw);
+  });
+  // Pata trasera recogida
+  dog.add(ell(0.08, 0.07, 0.16, tan, 0.24, 0.08, -0.4));
+
+  // Collar gris con chapa
+  const collar = new THREE.Mesh(new THREE.TorusGeometry(0.13, 0.03, 5, 10), solid(0x4b5563));
+  collar.position.set(0, 0.44, 0.2);
+  collar.rotation.x = Math.PI / 2 - 0.35;
+  const tag = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.045, 0.012, 8), solid(0xcbd5e1, { metalness: 0.6, roughness: 0.3 }));
+  tag.rotation.x = Math.PI / 2;
+  tag.position.set(0, 0.33, 0.3);
+  dog.add(collar, tag);
+
+  // Cabeza
+  const head = new THREE.Group();
+  head.position.set(0, 0.6, 0.27);
+  head.add(
+    ell(0.17, 0.16, 0.17, tan, 0, 0, 0),
+    ell(0.09, 0.08, 0.12, white, 0, -0.05, 0.15),      // hocico blanco
+    ell(0.035, 0.03, 0.03, solid(0x5b3a2e), 0, -0.02, 0.27) // nariz
+  );
+  const blaze = new THREE.Mesh(new THREE.BoxGeometry(0.035, 0.15, 0.03), white);   // mancha de la frente
+  blaze.position.set(0, 0.07, 0.15);
+  blaze.rotation.x = -0.5;
+  head.add(blaze);
+  [-0.07, 0.07].forEach(x => head.add(ell(0.022, 0.022, 0.015, solid(0x2b1b14), x, 0.04, 0.15)));  // ojos
+  const ears = [-1, 1].map(side => {
+    const ear = new THREE.Mesh(new THREE.BoxGeometry(0.13, 0.18, 0.03), tanDark);
+    ear.position.set(side * 0.16, 0.02, 0);
+    ear.rotation.set(0, side * 0.3, side * 0.75);       // orejas caídas hacia los lados
+    head.add(ear);
+    return ear;
+  });
+  dog.add(head);
+
+  // Rabo
+  const tail = new THREE.Group();
+  tail.position.set(0.04, 0.22, -0.66);
+  const tailMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.022, 0.038, 0.24, 5), tan);
+  tailMesh.rotation.x = Math.PI / 2 + 0.15;           // apoyado en la cama, pegado al cuerpo
+  tailMesh.position.set(0, -0.02, -0.11);
+  tail.add(tailMesh);
+  dog.add(tail);
+
+  return {
+    group: g,
+    update(time) {
+      body.scale.y = 1 + Math.sin(time * 2.2) * 0.025;                 // respira
+      const wag = Math.sin(time * 0.45) > 0.55 ? 0.6 : 0.08;             // a ratos mueve el rabo
+      tail.rotation.y = 0.9 + Math.sin(time * 9) * wag * 0.6;          // curvado hacia un lado
+      head.rotation.z = Math.sin(time * 0.3) > 0.85 ? 0.18 : 0;          // y ladea la cabeza de vez en cuando
+      ears.forEach((e, i) => { e.rotation.x = Math.sin(time * 0.6 + i) > 0.92 ? -0.25 : 0; });
     }
   };
 }
