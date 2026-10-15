@@ -1,0 +1,411 @@
+{
+  "meta": {
+    "lang": "en",
+    "title": "Alba Rodríguez — Junior AI Engineer",
+    "description": "Junior AI Engineer: agents built with LangChain and LangGraph that use tools, RAG and real data, measured with tests and LangSmith evaluations.",
+    "ogLocale": "en_GB"
+  },
+
+  "ui": {
+    "skip": "Skip to content",
+    "langToggle": "Cambiar idioma / Change language",
+    "cases": "Case studies",
+    "minimap": "The message's journey through the agent graph",
+    "nodeOf": "node {i}/{n}",
+    "copy": "Copy",
+    "copyLabel": "Copy the email address to the clipboard",
+    "copied": "Email copied ✓",
+    "copyError": "Couldn't copy it. Please select the email and copy it by hand.",
+    "showCall": "Show the call",
+    "hideCall": "Hide the call",
+    "code": "Code ↗",
+    "caseStudy": "Case study →",
+    "demo": "Demo ↗",
+    "status": { "idle": "idle", "running": "running", "done": "completed" },
+    "techs": "Technologies",
+    "classic": "Classic version of the portfolio"
+  },
+
+  "nodes": [
+    { "id": "start",      "name": "__start__",  "label": "Start" },
+    { "id": "agent",      "name": "agent",      "label": "About" },
+    { "id": "state",      "name": "state",      "label": "Education" },
+    { "id": "tools",      "name": "tools",      "label": "Projects" },
+    { "id": "retriever",  "name": "retriever",  "label": "Stack" },
+    { "id": "guardrails", "name": "guardrails", "label": "Principles" },
+    { "id": "evaluator",  "name": "evaluator",  "label": "How I work" },
+    { "id": "end",        "name": "__end__",    "label": "Contact" }
+  ],
+
+  "edges": {
+    "start-agent": "HumanMessage",
+    "agent-state": "state.update()",
+    "state-tools": "tool_calls",
+    "tools-retriever": "retriever.invoke()",
+    "retriever-guardrails": "check()",
+    "guardrails-evaluator": "evaluate()",
+    "evaluator-end": "final_answer"
+  },
+
+  "hero": {
+    "kind": "input · HumanMessage",
+    "traceTitle": "trace · run_0001",
+    "trace": [
+      "$ graph.invoke({\"messages\": [your_visit]})",
+      "[__start__] message received",
+      "HumanMessage: “Who is Alba and what does she build?”",
+      "→ next node: agent"
+    ],
+    "counterLabel": "state[\"messages\"]",
+    "tag": "Junior AI Engineer · Generative AI",
+    "name": "Alba Rodríguez",
+    "summary": "Junior generative AI developer with a Data Science background. I build agents with LangChain and LangGraph that use tools, RAG and real data — and I <strong>measure</strong> them with tests and evaluations in LangSmith.",
+    "metrics": [
+      { "value": "99%", "label": "accuracy on 35 real leads" },
+      { "value": "$0.003", "label": "approx. per qualified lead" },
+      { "value": "+100", "label": "automated tests" }
+    ],
+    "ctaProjects": "See projects →",
+    "ctaCases": "Case studies",
+    "ctaContact": "Contact",
+    "scrollHint": "Scroll: your message is about to travel through the graph"
+  },
+
+  "agent": {
+    "kind": "LLM · call_model",
+    "title": "About me",
+    "thinking": "the LLM is reasoning",
+    "role": "AIMessage",
+    "paragraphs": [
+      "I'm <strong>Alba Rodríguez</strong>. I trained in Data Science and Artificial Intelligence at The Bridge and I'm now specialising in <strong>generative AI and agents</strong>.",
+      "I build projects around real use cases: agents that use tools, RAG over business documents, databases and interfaces you can try. And I document what didn't work and what's still left.",
+      "I use AI tools (Copilot, Claude, ChatGPT) to speed up development and debugging — AI doesn't replace judgement, it amplifies it.",
+      "I'm looking for my first role as a <strong>Junior AI Engineer</strong> in a team where I can keep learning and contribute from day one."
+    ],
+    "cv": "View CV →"
+  },
+
+  "state": {
+    "kind": "memory · checkpointer",
+    "title": "Education and path",
+    "intro": "Each stage of my training is a new message appended to <code>state[\"messages\"]</code>: the memory builds up as you scroll down.",
+    "messagesLabel": "state[\"messages\"]",
+    "jsonTitle": "state.json",
+    "bootcamp": {
+      "name": "Data Science and Artificial Intelligence Bootcamp — The Bridge",
+      "dates": "2025 – 2026",
+      "desc": "Intensive project-based training with Python, Machine Learning and production deployment."
+    },
+    "messages": [
+      {
+        "key": "ramp_up",
+        "role": "Module 1 · The Bridge",
+        "title": "Ramp-up",
+        "desc": "Introduction to Data Science, mathematical and statistical foundations, and Python programming from scratch."
+      },
+      {
+        "key": "data_analysis",
+        "role": "Module 2 · The Bridge",
+        "title": "Data Analysis",
+        "desc": "Data access (files, APIs, web scraping), SQL databases and an introduction to NoSQL, cleaning and preprocessing, EDA, feature engineering and advanced visualisation."
+      },
+      {
+        "key": "machine_learning",
+        "role": "Module 3 · The Bridge",
+        "title": "Machine Learning",
+        "desc": "Supervised and unsupervised learning, model evaluation, cross-validation, neural networks (DNN, CNN, RNN), transfer learning, fine-tuning and an introduction to generative AI."
+      },
+      {
+        "key": "data_science_business",
+        "role": "Module 4 · The Bridge",
+        "title": "Data Science &amp; Business",
+        "desc": "Productising and deploying models, storytelling and communicating results, building business-oriented data products."
+      },
+      {
+        "key": "genai_agents",
+        "role": "2026 – present · self-taught",
+        "title": "Generative AI and Agents",
+        "desc": "Self-taught training, separate from the bootcamp, in LLMs, RAG, prompt engineering and agent development with LangChain and LangGraph, applied in my own projects.",
+        "highlight": true
+      }
+    ],
+    "languagesTitle": "state[\"languages\"]",
+    "languages": [
+      { "name": "Spanish", "level": "Native", "desc": "Native spoken and written communication. Technical writing, presentations and documentation." },
+      { "name": "English", "level": "B2 – C1", "desc": "Solid reading and listening: fluent reading of technical documentation, papers and specialised resources. Functional speaking, able to hold professional conversations with growing confidence." }
+    ],
+    "nowTitle": "What I'm working on",
+    "nowKey": "state[\"current_task\"]",
+    "now": [
+      "Building a lead generation platform with agents: right now, a multi-agent system that audits websites.",
+      "Going deeper into RAG, LLM evaluation and engineering best practices."
+    ]
+  },
+
+  "tools": {
+    "kind": "ToolNode",
+    "title": "Agent projects",
+    "intro": "Each project is a tool the agent can call. Hover, focus with the keyboard or press “Show the call” to expand the arguments and the run.",
+    "note": "Function signatures are an illustrative representation; the nodes, tools and figures are the real ones from each project.",
+    "argsLabel": "args",
+    "stepsLabel": "run",
+    "resultLabel": "→ result",
+    "main": [
+      {
+        "id": "leads",
+        "type": "Agents · Evaluation",
+        "title": "Lead qualification agent",
+        "fn": "qualify_lead",
+        "params": "company_url, max_pages=4",
+        "args": "{\n  \"company_url\": \"https://…\",\n  \"max_pages\": 4,\n  \"model\": \"gpt-4.1-mini\"\n}",
+        "desc": "A LangGraph graph built node by node: it researches a company's website, copies the evidence word for word and turns it into structured data with Pydantic. The final decision is made by tested business rules, not the LLM. Evaluated in LangSmith on 35 real leads checked against each company's website: analysing the failures took it from 90% to 99%.",
+        "steps": [
+          { "name": "research", "note": "LLM · decides" },
+          { "name": "tools", "note": "reads the website · no AI" },
+          { "name": "extract", "note": "LLM → Pydantic" },
+          { "name": "score", "note": "rules · no AI" }
+        ],
+        "result": [
+          { "value": "99%", "label": "correct action · 35 leads" },
+          { "value": "$0.003", "label": "approx. per lead" },
+          { "value": "5–20 s", "label": "per lead" },
+          { "value": "87", "label": "rule and dataset tests" }
+        ],
+        "tags": ["LangGraph", "LangSmith", "Pydantic", "GPT-4.1 mini", "Pytest", "BeautifulSoup"],
+        "case": "https://albarodriguez7.github.io/casos.html#leads",
+        "code": "https://github.com/albarodriguez7/AgentesIA_Marketing"
+      },
+      {
+        "id": "reservas",
+        "type": "Agents · RAG",
+        "title": "AI booking assistant",
+        "fn": "handle_booking",
+        "params": "message, thread_id",
+        "args": "{\n  \"message\": \"Any slot on Friday?\",\n  \"thread_id\": \"…\",\n  \"tools\": 11\n}",
+        "desc": "An agent with 11 tools that books, changes and cancels appointments for a hair salon on SQLite with atomic transactions. It answers business questions with RAG (Chroma), mirrors the schedule to Google Calendar and ships three Streamlit apps: customer chat, staff schedule and owner dashboard.",
+        "steps": [
+          { "name": "Streamlit", "note": "chat · schedule · dashboard" },
+          { "name": "agent", "note": "create_agent + dynamic prompt" },
+          { "name": "RAG + tools", "note": "Chroma · 11 tools" },
+          { "name": "SQLite", "note": "atomic writes" },
+          { "name": "Google Calendar", "note": "read-only mirror" }
+        ],
+        "result": [
+          { "value": "11", "label": "agent tools" },
+          { "value": "97", "label": "pytest tests" },
+          { "value": "3", "label": "Streamlit apps" },
+          { "value": "90", "label": "days in Google Calendar" }
+        ],
+        "tags": ["LangChain", "LangGraph", "Chroma", "SQLite", "Streamlit", "Google Calendar", "LangSmith"],
+        "case": "https://albarodriguez7.github.io/casos.html#reservas",
+        "code": "https://github.com/albarodriguez7/ChatBot_Peluqueria"
+      }
+    ],
+    "secondaryTitle": "Secondary tools · Data Science and APIs",
+    "secondary": [
+      {
+        "id": "api",
+        "type": "API development",
+        "title": "Traffic Violations API",
+        "fn": "predict_infraction",
+        "params": "features",
+        "desc": "REST API with FastAPI serving a machine learning model that predicts traffic violations. Deployed on Render and publicly available.",
+        "result": "REST API deployed on Render",
+        "tags": ["FastAPI", "Pydantic", "Uvicorn", "Render"],
+        "code": "https://github.com/albarodriguez7/API_Infracciones_Trafico",
+        "demo": "https://api-infracciones-trafico.onrender.com/"
+      },
+      {
+        "id": "ml",
+        "type": "Machine Learning",
+        "title": "Traffic Violations ML",
+        "fn": "train_classifier",
+        "params": "historical_data",
+        "desc": "Classification model that predicts traffic violations from historical data, applying classification and model evaluation techniques.",
+        "result": "evaluated classification model",
+        "tags": ["Scikit-learn", "LightGBM", "XGBoost", "Pandas"],
+        "code": "https://github.com/albarodriguez7/ML_Infracciones_Trafico"
+      },
+      {
+        "id": "airbnb",
+        "type": "Data Analysis",
+        "title": "Airbnb price analysis",
+        "fn": "explore_prices",
+        "params": "city=\"Madrid\"",
+        "desc": "Exploratory analysis of Airbnb data in Madrid: neighbourhood and room type are the factors that best explain price variation.",
+        "result": "neighbourhood + room type explain price",
+        "tags": ["Pandas", "NumPy", "Seaborn"],
+        "code": "https://github.com/albarodriguez7/EDA_Airbnb"
+      }
+    ]
+  },
+
+  "retriever": {
+    "kind": "RAG · vector store",
+    "title": "Stack",
+    "intro": "My technologies as a vector space, grouped by category. Hover or focus a point: the retriever returns where I use it.",
+    "queryLabel": "retriever.invoke",
+    "resultsLabel": "retrieved documents",
+    "empty": "Pick a technology to run the query.",
+    "sources": {
+      "leads": "Lead qualification agent",
+      "reservas": "AI booking assistant",
+      "api": "Traffic Violations API",
+      "ml": "Traffic Violations ML",
+      "airbnb": "Airbnb price analysis",
+      "all": "All my projects",
+      "bootcamp": "Training · The Bridge Bootcamp",
+      "pending": "[PENDING]"
+    },
+    "clusters": [
+      {
+        "id": "agents",
+        "name": "Agents and LLMs",
+        "items": [
+          { "name": "LangGraph", "uses": ["leads", "reservas"] },
+          { "name": "LangChain", "uses": ["leads", "reservas"] },
+          { "name": "RAG", "uses": ["reservas"] },
+          { "name": "Chroma", "uses": ["reservas"] },
+          { "name": "OpenAI API", "uses": ["leads", "reservas"] }
+        ]
+      },
+      {
+        "id": "data",
+        "name": "Data and ML",
+        "items": [
+          { "name": "Python", "uses": ["all"] },
+          { "name": "Pandas", "uses": ["ml", "airbnb"] },
+          { "name": "NumPy", "uses": ["airbnb"] },
+          { "name": "Scikit-learn", "uses": ["ml"] },
+          { "name": "LightGBM", "uses": ["ml"] },
+          { "name": "XGBoost", "uses": ["ml"] },
+          { "name": "SciPy", "uses": ["ml"] },
+          { "name": "Matplotlib", "uses": ["airbnb"] },
+          { "name": "Seaborn", "uses": ["airbnb"] },
+          { "name": "SQL", "uses": ["bootcamp"] },
+          { "name": "BeautifulSoup", "uses": ["leads"] }
+        ]
+      },
+      {
+        "id": "backend",
+        "name": "Backend and deployment",
+        "items": [
+          { "name": "FastAPI", "uses": ["api"] },
+          { "name": "Pydantic", "uses": ["leads", "api"] },
+          { "name": "Uvicorn", "uses": ["api"] },
+          { "name": "Render", "uses": ["api"] },
+          { "name": "Streamlit", "uses": ["reservas"] },
+          { "name": "SQLite", "uses": ["reservas"] },
+          { "name": "Google Calendar API", "uses": ["reservas"] },
+          { "name": "AWS", "uses": ["bootcamp"] },
+          { "name": "Git", "uses": ["all"] },
+          { "name": "Docker", "uses": ["pending"] },
+          { "name": "Poetry", "uses": ["pending"] }
+        ]
+      },
+      {
+        "id": "quality",
+        "name": "Quality and evaluation",
+        "items": [
+          { "name": "LangSmith", "uses": ["leads", "reservas"] },
+          { "name": "Pytest", "uses": ["leads", "reservas"] }
+        ]
+      }
+    ]
+  },
+
+  "guardrails": {
+    "kind": "control rules",
+    "title": "How I build reliable agents",
+    "intro": "An agent that works in a demo isn't enough. These are decisions I made in my own projects so the LLM is useful without being trusted blindly. Your message has to pass all of them.",
+    "appliesTo": "applies to",
+    "passed": "passed",
+    "rules": [
+      {
+        "id": "extract_then_decide",
+        "title": "AI extracts, code decides",
+        "desc": "The LLM only does what it does better than code: understanding messy text. Scoring and the final decision are Python rules covered by 16 tests — consistent, explainable and free.",
+        "agent": "Leads agent"
+      },
+      {
+        "id": "evidence_not_conclusions",
+        "title": "Evidence, not conclusions",
+        "desc": "Instead of asking “how many locations does it have?”, the agent must copy the exact sentence or addresses from the website. If it can't find them it says “not found” instead of guessing.",
+        "agent": "Leads agent"
+      },
+      {
+        "id": "limits_in_code",
+        "title": "Limits live in code",
+        "desc": "The page limit doesn't depend on the model obeying: when it is reached, code removes the tools (<code>tool_choice=\"none\"</code>). In bookings, code — not the model — fixes which customer is being served, so “cancel customer 3's appointment” does nothing.",
+        "agent": "Both agents"
+      },
+      {
+        "id": "measure_before_improving",
+        "title": "Measure before improving",
+        "desc": "A LangSmith dataset of 35 real leads, each answer backed by a quote from the company's website, with 5 separate evaluators. Going through every failure in the traces I found 4 real problems in the agent, fixed them and went from 90% to 99%, comparing experiments at each step.",
+        "agent": "Leads agent"
+      },
+      {
+        "id": "consistent_data",
+        "title": "Consistent data",
+        "desc": "Bookings use SQLite transactions with <code>BEGIN IMMEDIATE</code> so two customers can't take the same slot. Google Calendar is a mirror: if Google fails, the booking is still saved and syncs later.",
+        "agent": "Booking assistant"
+      },
+      {
+        "id": "no_made_up_dates",
+        "title": "No made-up dates",
+        "desc": "A dynamic prompt injects today's date in Madrid plus a 14-day calendar on every message, so the model maps “next Friday” to a real date without doing date arithmetic.",
+        "agent": "Booking assistant"
+      }
+    ]
+  },
+
+  "evaluator": {
+    "kind": "LangSmith · evaluation",
+    "title": "How I work",
+    "intro": "My process, shown as an evaluation pipeline: every step leaves a trace you can review.",
+    "traceRoot": "evaluate(project)",
+    "steps": [
+      { "id": "use_case", "title": "Use case", "desc": "Understand the business need and what the assistant or agent has to solve." },
+      { "id": "agent_design", "title": "Agent design", "desc": "Choose tools, information sources (RAG), memory, and how it connects to APIs and databases." },
+      { "id": "test_and_eval", "title": "Testing and evaluation", "desc": "Automated tests for the deterministic logic and LangSmith datasets and traces to measure the agent's answers." },
+      { "id": "ui_and_deploy", "title": "Interface and deployment", "desc": "Streamlit interfaces and FastAPI APIs, deployed to the cloud." },
+      { "id": "docs", "title": "Documentation", "desc": "READMEs with the technical decisions and known limitations, so the project can be understood and improved." }
+    ],
+    "chart": {
+      "title": "Correct action of the leads agent",
+      "subtitle": "LangSmith dataset of 35 real leads · 5 evaluators",
+      "bars": [
+        { "label": "Before analysing the failures", "value": 90, "display": "90%" },
+        { "label": "Final version", "value": 99, "display": "99%" }
+      ],
+      "delta": "+9 points",
+      "runs": "34–35/35 across 3 runs of the final version",
+      "fixesTitle": "4 real problems found in the traces",
+      "fixes": [
+        "It missed addresses on long pages",
+        "It made up the city",
+        "It counted 1 location for a chain of 21 restaurants",
+        "It had no sector criteria"
+      ],
+      "source": "See the full analysis in the case study →",
+      "tableCaption": "Correct-action rate before and after improving the agent"
+    }
+  },
+
+  "end": {
+    "kind": "final answer",
+    "code": "tool_choice=\"none\"",
+    "punchline": "I don't need any more tools. Let's talk.",
+    "title": "Shall we talk?",
+    "text": "I'm looking for Junior AI Engineer roles where I can build assistants and agents with generative AI and give my best from day one. If you have an interesting project or an opening, write to me.",
+    "email": "albarodriguezperales7@gmail.com",
+    "write": "Write to me ✉",
+    "linkedin": "https://www.linkedin.com/in/albarodriguezperales/",
+    "github": "https://github.com/albarodriguez7",
+    "cv": "https://albarodriguez7.github.io/CV_Alba_Rodriguez_AI_Engineer.pdf",
+    "cvLabel": "CV ↗"
+  },
+
+  "footer": "Alba Rodríguez · Junior AI Engineer · 2026"
+}
