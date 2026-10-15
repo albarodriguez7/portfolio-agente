@@ -1,7 +1,7 @@
 /* ==========================================================================
    memory.js — La memoria del agente (nodo state)
    Una torre de archivo: cada etapa de la formación es una placa (un mensaje)
-   que cae y se apila sobre la base del bootcamp. Alrededor, un anillo de
+   que cae y se apila sobre la base (la etapa anterior: Marketing y Publicidad). Alrededor, un anillo de
    "checkpoints" que gira lentamente.
    ========================================================================== */
 import * as THREE from 'three';
@@ -72,7 +72,8 @@ export function createMemory() {
     plates.clear();
     const s = c.state;
     const plain = html => { const d = document.createElement('div'); d.innerHTML = html; return d.textContent; };
-    const defs = [{ idx: 'base', kicker: s.bootcamp.dates, title: 'The Bridge', base: true }]
+    // la base es la etapa anterior (Marketing y Publicidad); encima, un mensaje por etapa
+    const defs = [{ idx: 'base', kicker: s.previous.dates, title: plain(s.previous.name), base: true }]
       .concat(s.messages.map((msg, i) => ({ idx: `[${i}]`, kicker: plain(msg.role), title: plain(msg.title), highlight: msg.highlight })));
 
     items = defs.map((d, i) => {

@@ -127,7 +127,7 @@
   "state": {
     "kind": "memory · checkpointer",
     "title": "Education and path",
-    "intro": "Each stage of my training is a new message appended to <code>state[\"messages\"]</code>: the memory builds up as you scroll down.",
+    "intro": "Each stage of my training is a new message appended to <code>state[\"messages\"]</code>, starting with Marketing and Advertising.",
     "messagesLabel": "state[\"messages\"]",
     "jsonTitle": "state.json",
     "bootcamp": {
@@ -136,12 +136,6 @@
       "desc": "Intensive project-based training with Python, Machine Learning and production deployment."
     },
     "messages": [
-      {
-        "key": "ramp_up",
-        "role": "Module 1 · The Bridge",
-        "title": "Ramp-up",
-        "desc": "Introduction to Data Science, mathematical and statistical foundations, and Python programming from scratch."
-      },
       {
         "key": "data_analysis",
         "role": "Module 2 · The Bridge",
@@ -186,7 +180,12 @@
     "now": [
       "Building a lead generation platform with agents: right now, a multi-agent system that audits websites.",
       "Going deeper into RAG, LLM evaluation and engineering best practices."
-    ]
+    ],
+    "previous": {
+      "name": "Marketing and Advertising",
+      "dates": "2022 – 2024",
+      "label": "Before AI"
+    }
   },
   "tools": {
     "kind": "ToolNode",
@@ -368,270 +367,82 @@
   "retriever": {
     "kind": "RAG · vector store",
     "title": "Stack",
-    "intro": "My technologies as a vector space, grouped by category. Hover or focus a point: the retriever returns where I use it.",
-    "queryLabel": "retriever.invoke",
-    "resultsLabel": "retrieved documents",
-    "empty": "Pick a technology to run the query.",
-    "sources": {
-      "leads": "Lead qualification agent",
-      "reservas": "AI booking assistant",
-      "api": "Traffic Violations API",
-      "ml": "Traffic Violations ML",
-      "airbnb": "Airbnb price analysis",
-      "all": "All my projects",
-      "bootcamp": "Training · The Bridge Bootcamp",
-      "pending": "[PENDING]"
-    },
+    "intro": "The tools I work with, indexed by category.",
     "clusters": [
       {
         "id": "agents",
         "name": "Agents and LLMs",
         "items": [
-          {
-            "name": "LangGraph",
-            "uses": [
-              "leads",
-              "reservas"
-            ]
-          },
-          {
-            "name": "LangChain",
-            "uses": [
-              "leads",
-              "reservas"
-            ]
-          },
-          {
-            "name": "RAG",
-            "uses": [
-              "reservas"
-            ]
-          },
-          {
-            "name": "Chroma",
-            "uses": [
-              "reservas"
-            ]
-          },
-          {
-            "name": "OpenAI API",
-            "uses": [
-              "leads",
-              "reservas"
-            ]
-          }
+          "LangGraph",
+          "LangChain",
+          "RAG",
+          "Chroma",
+          "OpenAI API"
         ]
       },
       {
         "id": "data",
         "name": "Data and ML",
         "items": [
-          {
-            "name": "Python",
-            "uses": [
-              "all"
-            ]
-          },
-          {
-            "name": "Pandas",
-            "uses": [
-              "ml",
-              "airbnb"
-            ]
-          },
-          {
-            "name": "NumPy",
-            "uses": [
-              "airbnb"
-            ]
-          },
-          {
-            "name": "Scikit-learn",
-            "uses": [
-              "ml"
-            ]
-          },
-          {
-            "name": "LightGBM",
-            "uses": [
-              "ml"
-            ]
-          },
-          {
-            "name": "XGBoost",
-            "uses": [
-              "ml"
-            ]
-          },
-          {
-            "name": "SciPy",
-            "uses": [
-              "ml"
-            ]
-          },
-          {
-            "name": "Matplotlib",
-            "uses": [
-              "airbnb"
-            ]
-          },
-          {
-            "name": "Seaborn",
-            "uses": [
-              "airbnb"
-            ]
-          },
-          {
-            "name": "SQL",
-            "uses": [
-              "bootcamp"
-            ]
-          },
-          {
-            "name": "BeautifulSoup",
-            "uses": [
-              "leads"
-            ]
-          }
+          "Python",
+          "Pandas",
+          "NumPy",
+          "Scikit-learn",
+          "LightGBM",
+          "XGBoost",
+          "SciPy",
+          "Matplotlib",
+          "Seaborn",
+          "SQL",
+          "BeautifulSoup"
         ]
       },
       {
         "id": "backend",
         "name": "Backend and deployment",
         "items": [
-          {
-            "name": "FastAPI",
-            "uses": [
-              "api"
-            ]
-          },
-          {
-            "name": "Pydantic",
-            "uses": [
-              "leads",
-              "api"
-            ]
-          },
-          {
-            "name": "Uvicorn",
-            "uses": [
-              "api"
-            ]
-          },
-          {
-            "name": "Render",
-            "uses": [
-              "api"
-            ]
-          },
-          {
-            "name": "Streamlit",
-            "uses": [
-              "reservas"
-            ]
-          },
-          {
-            "name": "SQLite",
-            "uses": [
-              "reservas"
-            ]
-          },
-          {
-            "name": "Google Calendar API",
-            "uses": [
-              "reservas"
-            ]
-          },
-          {
-            "name": "AWS",
-            "uses": [
-              "bootcamp"
-            ]
-          },
-          {
-            "name": "Git",
-            "uses": [
-              "all"
-            ]
-          },
-          {
-            "name": "Docker",
-            "uses": [
-              "pending"
-            ]
-          },
-          {
-            "name": "Poetry",
-            "uses": [
-              "pending"
-            ]
-          }
+          "FastAPI",
+          "Pydantic",
+          "Uvicorn",
+          "Render",
+          "Streamlit",
+          "SQLite",
+          "Google Calendar API",
+          "AWS",
+          "Git",
+          "Docker",
+          "Poetry"
         ]
       },
       {
         "id": "quality",
         "name": "Quality and evaluation",
         "items": [
-          {
-            "name": "LangSmith",
-            "uses": [
-              "leads",
-              "reservas"
-            ]
-          },
-          {
-            "name": "Pytest",
-            "uses": [
-              "leads",
-              "reservas"
-            ]
-          }
+          "LangSmith",
+          "Pytest"
         ]
       }
-    ]
+    ],
+    "indexLabel": "vectorstore.index"
   },
   "guardrails": {
     "kind": "control rules",
     "title": "How I build reliable agents",
-    "intro": "An agent that works in a demo isn't enough. These are decisions I made in my own projects so the LLM is useful without being trusted blindly. Your message has to pass all of them.",
+    "intro": "Two rules that sum up how I make the LLM useful without trusting it blindly. Your message has to pass both.",
     "appliesTo": "applies to",
     "passed": "passed",
     "rules": [
       {
         "id": "extract_then_decide",
         "title": "AI extracts, code decides",
-        "desc": "The LLM only does what it does better than code: understanding messy text. Scoring and the final decision are Python rules covered by 16 tests — consistent, explainable and free.",
-        "agent": "Leads agent"
-      },
-      {
-        "id": "evidence_not_conclusions",
-        "title": "Evidence, not conclusions",
-        "desc": "Instead of asking “how many locations does it have?”, the agent must copy the exact sentence or addresses from the website. If it can't find them it says “not found” instead of guessing.",
-        "agent": "Leads agent"
-      },
-      {
-        "id": "limits_in_code",
-        "title": "Limits live in code",
-        "desc": "The page limit doesn't depend on the model obeying: when it is reached, code removes the tools (<code>tool_choice=\"none\"</code>). In bookings, code — not the model — fixes which customer is being served, so “cancel customer 3's appointment” does nothing.",
+        "desc": "The LLM understands the text and copies the evidence word for word. Scoring, limits (<code>tool_choice=\"none\"</code>), the identified customer and dates are set by code, with tests.",
         "agent": "Both agents"
       },
       {
         "id": "measure_before_improving",
         "title": "Measure before improving",
-        "desc": "A LangSmith dataset of 35 real leads, each answer backed by a quote from the company's website, with 5 separate evaluators. Going through every failure in the traces I found 4 real problems in the agent, fixed them and went from 90% to 99%, comparing experiments at each step.",
-        "agent": "Leads agent"
-      },
-      {
-        "id": "consistent_data",
-        "title": "Consistent data",
-        "desc": "Bookings use SQLite transactions with <code>BEGIN IMMEDIATE</code> so two customers can't take the same slot. Google Calendar is a mirror: if Google fails, the booking is still saved and syncs later.",
-        "agent": "Booking assistant"
-      },
-      {
-        "id": "no_made_up_dates",
-        "title": "No made-up dates",
-        "desc": "A dynamic prompt injects today's date in Madrid plus a 14-day calendar on every message, so the model maps “next Friday” to a real date without doing date arithmetic.",
-        "agent": "Booking assistant"
+        "desc": "A LangSmith dataset of 35 real leads with 5 evaluators: going through every failure in the traces took it from 90% to 99%. And consistent data: atomic SQLite bookings.",
+        "agent": "Both agents"
       }
     ]
   },
@@ -746,10 +557,6 @@
     "phrase1": {
       "kicker": "agent → state",
       "phrase": "AI doesn't replace judgement, it amplifies it."
-    },
-    "phrase2": {
-      "kicker": "guardrails → evaluator",
-      "phrase": "AI extracts, code decides."
     }
   },
   "labels": {

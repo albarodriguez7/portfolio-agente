@@ -1,20 +1,19 @@
 /* ==========================================================================
    gates.js — Los guardrails
-   Un pasillo con 6 arcos de control. Cada uno tiene barras láser rojas que
+   Un pasillo con 2 arcos de control (cada uno resume varias reglas). Cada uno tiene barras láser rojas que
    se abren y se vuelven verdes cuando el mensaje (la cámara) las supera.
    ========================================================================== */
 import * as THREE from 'three';
 import { C, solid, neon, edges, label, smooth, gridFloor } from './kit.js';
 
-export const GATES = { zStart: -372, first: -386, step: 10, count: 6 };
+export const GATES = { zStart: -366, first: -380, step: 14, count: 2 };
 
 export function createGates() {
   const group = new THREE.Group();
   group.name = 'gates';
 
   const floor = gridFloor(40, 20, C.grid, 0.9);
-  floor.position.set(0, -2.5, -410);
-  floor.scale.z = 2.2;
+  floor.position.set(0, -2.5, -392);
   group.add(floor);
   group.add(new THREE.HemisphereLight(0xa99bff, 0x0a0614, 0.7));
 

@@ -12,11 +12,11 @@ Portfolio de **Alba Rodríguez — Junior AI Engineer** en forma de recorrido 3D
 | 2 | Túnel del tokenizador: el mensaje se rompe en tokens | — | Frase |
 | 3 | El LLM por dentro: capas de neuronas y pulsos de atención | `agent` | Sobre mí |
 | 4 | Núcleo de decisión | — | Frase |
-| 5 | Torre de memoria: cada etapa de la formación cae como una placa | `state` | Formación |
+| 5 | Torre de memoria: sobre la base (Marketing y Publicidad) cae cada etapa de la formación como una placa | `state` | Formación |
 | 6 | Taller: un pedestal por proyecto que se «ejecuta» al pasar | `tools` | Proyectos |
-| 7 | Galaxia de vectores con las tecnologías como estrellas | `retriever` | Stack |
-| 8 | Arcos láser que se abren y se vuelven verdes | `guardrails` | Principios |
-| 9 | Pasillo con flujos de datos | — | Frase |
+| 7 | Índice del retriever: 4 fichas de cristal (una por categoría) que un haz lee una a una | `retriever` | Stack |
+| 8 | 2 vallas láser que se abren y se vuelven verdes (resumen de las reglas) | `guardrails` | Principios |
+| 9 | Pasillo con flujos de datos | — | — |
 | 10 | Sala de control con monitores tipo LangSmith | `evaluator` | Cómo trabajo |
 | 11 | Salimos por la pantalla con la respuesta del agente | `__end__` | Contacto |
 
@@ -43,9 +43,9 @@ data/content.*.json    Todo el texto en español e inglés
 Todo el texto está en `data/content.es.json` y `data/content.en.json`, con la misma estructura en los dos. Los paneles **y** las escenas 3D se rellenan desde ahí: las placas de la memoria, las pantallas del taller, las estrellas del stack, los monitores de la sala de control y el chat del ordenador.
 
 - **Proyectos:** `tools.main` y `tools.secondary`.
-- **Stack:** `retriever.clusters`. El campo `uses` indica en qué proyectos se usa cada tecnología; `pending` = [PENDIENTE].
-- **Formación:** `state.messages`.
-- **Principios y proceso:** `guardrails.rules` y `evaluator`.
+- **Stack:** `retriever.clusters` (una lista de nombres por categoría; aparecen en el panel y en las fichas 3D).
+- **Formación:** `state.previous` (la base de la torre), `state.bootcamp` y `state.messages`.
+- **Principios y proceso:** `guardrails.rules` (una valla por regla) y `evaluator`.
 - **Textos del recorrido:** `screen` (chat del ordenador), `tokens`, `scenes` (frases grandes) y `hud`.
 
 Para mover la cámara o cambiar el ritmo, edita `KEYFRAMES` en `js/world/journey.js`. Cada escena tiene fotogramas con `u` (0 → 1, el progreso dentro de su sección), posición, punto al que mira y `shift`, que desplaza el encuadre para dejar sitio al panel.

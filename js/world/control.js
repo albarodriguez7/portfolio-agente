@@ -7,11 +7,14 @@
 import * as THREE from 'three';
 import { C, MONO, solid, neon, edges, canvasTexture, screenMesh, roundRect, wrapText, gridFloor, smooth, clamp, mulberry } from './kit.js';
 
-export const CONTROL = { wallZ: -482, exit: new THREE.Vector3(0, 3.5, -481.9) };
+// La sala se construye en coordenadas propias y se acerca SHIFT metros al pasillo
+const SHIFT = 50;
+export const CONTROL = { wallZ: -482, exit: new THREE.Vector3(0, 3.5, -481.9 + SHIFT) };
 
 export function createControl() {
   const group = new THREE.Group();
   group.name = 'control';
+  group.position.z = SHIFT;
   const rand = mulberry(21);
 
   const floor = gridFloor(50, 25, C.grid, 0.9);
@@ -176,7 +179,7 @@ export function createControl() {
 
   return {
     group,
-    range: [-438, -500],
+    range: [-438 + SHIFT, -500 + SHIFT],
     setContent(c) { content = c; drawStatic(); lastDraw = -1; },
     update(time, { u }) {
       leds.forEach((l, i) => { l.visible = Math.sin(time * (2 + (i % 4)) + i * 2.1) > -0.4; });

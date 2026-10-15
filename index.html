@@ -80,14 +80,14 @@
 <nav class="graph-hud" id="graph-hud" data-i18n-attr="aria-label:ui.minimap" aria-label="Recorrido del mensaje por el grafo del agente">
   <p class="hud-title" data-i18n="hud.graph">$ graph.get_graph()</p>
   <ol>
-    <li><a href="#start" data-node="start">__start__</a></li>
-    <li><a href="#agent" data-node="agent">agent</a></li>
-    <li><a href="#state" data-node="state">state</a></li>
-    <li><a href="#tools" data-node="tools">tools</a></li>
-    <li><a href="#retriever" data-node="retriever">retriever</a></li>
-    <li><a href="#guardrails" data-node="guardrails">guardrails</a></li>
-    <li><a href="#evaluator" data-node="evaluator">evaluator</a></li>
-    <li><a href="#end" data-node="end">__end__</a></li>
+    <li><a href="#start" data-node="start" data-label="__start__">__start__</a></li>
+    <li><a href="#agent" data-node="agent" data-label="agent">agent</a></li>
+    <li><a href="#state" data-node="state" data-label="state">state</a></li>
+    <li><a href="#tools" data-node="tools" data-label="tools">tools</a></li>
+    <li><a href="#retriever" data-node="retriever" data-label="retriever">retriever</a></li>
+    <li><a href="#guardrails" data-node="guardrails" data-label="guardrails">guardrails</a></li>
+    <li><a href="#evaluator" data-node="evaluator" data-label="evaluator">evaluator</a></li>
+    <li><a href="#end" data-node="end" data-label="__end__">__end__</a></li>
   </ol>
 </nav>
 
@@ -169,6 +169,11 @@ guest login: <span class="boot-ok">visitante</span></pre>
         <p class="kicker"><span class="node-chip">state</span></p>
         <h2 id="state-title" tabindex="-1" data-i18n="state.title">Formación y trayectoria</h2>
         <p class="lead-sm" data-i18n="state.intro"></p>
+        <div class="previous">
+          <p class="msg-role" data-i18n="state.previous.label">Antes de la IA</p>
+          <h3 data-i18n="state.previous.name">Marketing y Publicidad</h3>
+          <p class="dates"><code data-i18n="state.previous.dates">2022 – 2024</code></p>
+        </div>
         <div class="bootcamp">
           <h3 data-i18n="state.bootcamp.name">Bootcamp Data Science e Inteligencia Artificial — The Bridge</h3>
           <p class="dates"><code data-i18n="state.bootcamp.dates">2025 – 2026</code></p>
@@ -207,11 +212,8 @@ guest login: <span class="boot-ok">visitante</span></pre>
         <p class="kicker"><span class="node-chip">retriever</span></p>
         <h2 id="retriever-title" tabindex="-1" data-i18n="retriever.title">Stack</h2>
         <p class="lead-sm" data-i18n="retriever.intro"></p>
-        <div class="stack" id="stack" role="group" aria-labelledby="retriever-title"></div>
-        <div class="retrieval" aria-live="polite">
-          <p class="query"><code><span data-i18n="retriever.queryLabel">retriever.invoke</span>(<span class="q-str" id="retrieval-query">…</span>)</code></p>
-          <div id="retrieval-results"></div>
-        </div>
+        <p class="index-label"><code data-i18n="retriever.indexLabel">vectorstore.index</code></p>
+        <div class="stack" id="stack"></div>
       </div>
     </div>
   </section>
@@ -221,19 +223,11 @@ guest login: <span class="boot-ok">visitante</span></pre>
     <div class="panel">
       <div class="panel-bar"><code>~/agent/guardrails.py</code><span data-i18n="guardrails.kind">reglas de control</span></div>
       <div class="panel-body">
-        <p class="kicker"><span class="node-chip">guardrails</span> <span class="gate-count"><b id="gates-passed">0</b>/6</span></p>
+        <p class="kicker"><span class="node-chip">guardrails</span> <span class="gate-count"><b id="gates-passed">0</b>/<span id="gates-total">2</span></span></p>
         <h2 id="guardrails-title" tabindex="-1" data-i18n="guardrails.title">Cómo construyo agentes fiables</h2>
         <p class="lead-sm" data-i18n="guardrails.intro"></p>
         <ol class="rules" id="rules"></ol>
       </div>
-    </div>
-  </section>
-
-  <!-- 9 · frase: de los guardrails a la sala de evaluación -->
-  <section class="scene scene--phrase" data-scene="gates-out" data-node="guardrails" aria-label="guardrails → evaluator">
-    <div class="phrase">
-      <p class="kicker" data-i18n="scenes.phrase2.kicker">guardrails → evaluator</p>
-      <p class="phrase-text" data-i18n="scenes.phrase2.phrase">La IA extrae, el código decide.</p>
     </div>
   </section>
 

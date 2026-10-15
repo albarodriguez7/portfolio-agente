@@ -76,7 +76,7 @@ export function createWorkshop() {
     const all = c.tools.main.map(t => ({ ...t, main: true })).concat(c.tools.secondary);
     all.forEach((tool, i) => {
       const root = new THREE.Group();
-      root.position.set(i % 2 ? 5.2 : 3.6, -3, -274 - i * 8.5);
+      root.position.set(i % 2 ? 4.4 : 2.9, -3, -274 - i * 8.5);
       root.rotation.y = -0.55;                  // mira hacia el pasillo (a la izquierda)
 
       const scale = tool.main ? 1 : 0.85;

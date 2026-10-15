@@ -48,23 +48,22 @@ export const KEYFRAMES = {
     { u: 1.0,  pos: v(-0.6, 1.2, -305), look: v(1.5, 0.5, -324),  shift: 0.6, track: 'in' }
   ],
   vectors: [
-    { u: 0.15, pos: v(-2.5, 2.2, -326), look: v(4, 1.5, -344),   shift: 0.6, track: 'in' },
-    { u: 0.6,  pos: v(-2, 1.8, -334),   look: v(5, 0.5, -349),   shift: 0.6, track: 'in' },
-    { u: 1.0,  pos: v(-1.5, 1.2, -356), look: v(0, 0.8, -372),  shift: 0.6, track: 'in' }
+    { u: 0.12, pos: v(-1.5, 2.2, -331), look: v(-4.2, 2.1, -341), shift: 1, track: 'in' },
+    { u: 0.33, pos: v(0, 2.2, -331),    look: v(-1, 2.1, -342),   shift: 1, track: 'in' },
+    { u: 0.53, pos: v(2, 2.2, -331),    look: v(3.6, 2.1, -342),  shift: 1, track: 'in' },
+    { u: 0.74, pos: v(3.4, 2.2, -331),  look: v(6.8, 2.1, -341),  shift: 1, track: 'in' },
+    { u: 0.88, pos: v(1.3, 2.0, -335),  look: v(1.3, 1.8, -350),  shift: 0.6, track: 'in' },
+    { u: 1.0,  pos: v(1.3, 1.6, -348),  look: v(0.5, 0.9, -368),  shift: 0.6, track: 'in' }
   ],
   gates: [
-    { u: 0.08, pos: v(0, 0.9, -368),   look: v(0, 0.6, -386),  shift: 0.6, track: 'in' },
-    { u: 1.0,  pos: v(0, 0.9, -437),   look: v(0, 0.8, -455),  shift: 0.6, track: 'in' }
-  ],
-  'gates-out': [
-    { u: 0.5,  pos: v(0, 1.4, -450),   look: v(0, 1.8, -472),  shift: 0, track: 'in' },
-    { u: 1.0,  pos: v(0, 1.9, -460),   look: v(0, 2, -482),    shift: 0.2, track: 'in' }
+    { u: 0.08, pos: v(0, 0.9, -362),   look: v(0, 0.6, -380),  shift: 0.6, track: 'in' },
+    { u: 1.0,  pos: v(0, 1.4, -404),   look: v(0, 2, -432),    shift: 0.4, track: 'in' }
   ],
   control: [
-    { u: 0.12, pos: v(0, 2, -462),     look: v(0, 1.9, -482),  shift: 0.55, track: 'in' },
-    { u: 0.7,  pos: v(0.3, 2.4, -469), look: v(0, 2.3, -482),  shift: 0.55, track: 'in' },
-    { u: 0.9,  pos: v(0, 3.4, -478.6), look: CONTROL.exit,     shift: 0.1, track: 'in' },
-    { u: 1.0,  pos: v(0, CONTROL.exit.y, CONTROL.exit.z + 0.12), look: v(0, CONTROL.exit.y, -500), shift: 0, track: 'in' }
+    { u: 0.12, pos: v(0, 2, -412),     look: v(0, 1.9, -432),  shift: 0.55, track: 'in' },
+    { u: 0.7,  pos: v(0.3, 2.4, -419), look: v(0, 2.3, -432),  shift: 0.55, track: 'in' },
+    { u: 0.9,  pos: v(0, 3.4, -428.6), look: CONTROL.exit,     shift: 0.1, track: 'in' },
+    { u: 1.0,  pos: v(0, CONTROL.exit.y, CONTROL.exit.z + 0.12), look: v(0, CONTROL.exit.y, -450), shift: 0, track: 'in' }
   ],
   'exterior-out': [
     { u: 0.0,  pos: v(0, S.y, S.z + 0.12),  look: v(0, S.y, 0),      shift: 0,   track: 'ext' },

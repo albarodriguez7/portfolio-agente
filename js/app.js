@@ -19,7 +19,6 @@ document.documentElement.classList.toggle('reduced', reduced);
 
 let content = null;
 let world = null;
-let selectedTech = null;
 
 /* ─────────────────────── 1. Contenido de los paneles ─────────────────────── */
 
@@ -81,34 +80,17 @@ function renderTools() {
 }
 
 function renderStack() {
-  const R = content.retriever;
-  $('#stack').innerHTML = R.clusters.map(cl => `
+  // lista limpia por categoría (las mismas fichas que el índice 3D)
+  $('#stack').innerHTML = content.retriever.clusters.map((cl, i) => `
     <div class="cluster cluster--${cl.id}">
-      <p class="cluster-name"><span class="centroid" aria-hidden="true"></span>${cl.name}</p>
-      <ul>${cl.items.map(it => `<li><button type="button" class="tech${it.uses.includes('pending') ? ' is-pending' : ''}" data-tech="${esc(it.name)}" data-uses="${it.uses.join(' ')}">${it.name}</button></li>`).join('')}</ul>
+      <p class="cluster-name"><span class="muted">[${i}]</span> ${cl.name}</p>
+      <p class="cluster-items">${cl.items.join('<span aria-hidden="true"> · </span>')}</p>
     </div>`).join('');
-  const current = $$('.tech').find(b => b.dataset.tech === selectedTech);
-  if (current) queryTech(current); else {
-    $('#retrieval-query').textContent = '…';
-    $('#retrieval-results').innerHTML = `<p class="muted">${R.empty}</p>`;
-  }
-}
-
-function queryTech(btn) {
-  const R = content.retriever;
-  const uses = btn.dataset.uses.split(' ');
-  selectedTech = btn.dataset.tech;
-  $$('.tech').forEach(b => b.classList.toggle('is-query', b === btn));
-  const target = { leads: '#tool-leads', reservas: '#tool-reservas', api: '#tool-api', ml: '#tool-ml', airbnb: '#tool-airbnb', bootcamp: '#state', all: '#tools' };
-  $('#retrieval-query').textContent = `"${selectedTech}"`;
-  $('#retrieval-results').innerHTML = `
-    <p class="muted">→ ${R.resultsLabel} (${uses.length})</p>
-    <ol class="results">${uses.map((u, i) => `<li><span class="muted">[${i}]</span> ${target[u] ? `<a href="${target[u]}">${R.sources[u]}</a>` : `<span class="muted">${R.sources[u] || u}</span>`}</li>`).join('')}</ol>`;
-  if (world) world.highlightTech(selectedTech);
 }
 
 function renderRules() {
   const G = content.guardrails;
+  $('#gates-total').textContent = G.rules.length;
   $('#rules').innerHTML = G.rules.map((r, i) => `
     <li class="rule" data-index="${i}">
       <p class="rule-id"><code>guardrail_${String(i + 1).padStart(2, '0')} · ${r.id}</code><span class="rule-status"><span aria-hidden="true">✓</span> ${G.passed}</span></p>
@@ -164,13 +146,6 @@ function bindToolCards() {
     card.addEventListener('focusout', e => { if (!card.contains(e.relatedTarget) && !pinned && !(hoverCapable && card.matches(':hover'))) setOpen(false); });
     btn.addEventListener('click', () => { const open = !card.classList.contains('is-open'); pinned = open; setOpen(open); });
   });
-}
-
-function bindStack() {
-  const stack = $('#stack');
-  stack.addEventListener('mouseover', e => { const b = e.target.closest('.tech'); if (b && hoverCapable) queryTech(b); });
-  stack.addEventListener('focusin', e => { const b = e.target.closest('.tech'); if (b) queryTech(b); });
-  stack.addEventListener('click', e => { const b = e.target.closest('.tech'); if (b) queryTech(b); });
 }
 
 function bindCopy() {
@@ -279,7 +254,8 @@ function updateHud({ t, active, local, flash }) {
 
     const passed = world.gatesPassed();
     $('#gates-passed').textContent = passed;
-    $$('.rule').forEach((r, i) => r.classList.toggle('is-passed', i < passed || (local['gates-out'] || 0) > 0 || (local.control || 0) > 0 || (local['exterior-out'] || 0) > 0));
+    const after = (local.control || 0) > 0 || (local['exterior-out'] || 0) > 0;
+    $$('.rule').forEach((r, i) => r.classList.toggle('is-passed', i < passed || after));
   }
 }
 
@@ -313,7 +289,6 @@ async function boot() {
   if (!world) document.documentElement.classList.add('no-webgl');
 
   renderAll();
-  bindStack();
   bindCopy();
   bindAnchors();
 

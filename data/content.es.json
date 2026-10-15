@@ -127,7 +127,7 @@
   "state": {
     "kind": "memoria · checkpointer",
     "title": "Formación y trayectoria",
-    "intro": "Cada etapa de mi formación es un mensaje nuevo que se añade a <code>state[\"messages\"]</code>: la memoria se va acumulando a medida que bajas.",
+    "intro": "Cada etapa de mi formación es un mensaje nuevo que se añade a <code>state[\"messages\"]</code>, empezando por Marketing y Publicidad.",
     "messagesLabel": "state[\"messages\"]",
     "jsonTitle": "state.json",
     "bootcamp": {
@@ -136,12 +136,6 @@
       "desc": "Formación intensiva basada en proyectos reales, trabajando con Python, Machine Learning y despliegue en producción."
     },
     "messages": [
-      {
-        "key": "ramp_up",
-        "role": "Módulo 1 · The Bridge",
-        "title": "Ramp-up",
-        "desc": "Introducción a Data Science, fundamentos matemáticos y estadísticos, y programación con Python desde cero."
-      },
       {
         "key": "data_analysis",
         "role": "Módulo 2 · The Bridge",
@@ -186,7 +180,12 @@
     "now": [
       "Construyendo una plataforma de captación con agentes: ahora, un sistema multiagente de auditoría web.",
       "Profundizando en RAG, evaluación de LLMs y buenas prácticas de ingeniería."
-    ]
+    ],
+    "previous": {
+      "name": "Marketing y Publicidad",
+      "dates": "2022 – 2024",
+      "label": "Antes de la IA"
+    }
   },
   "tools": {
     "kind": "ToolNode",
@@ -368,270 +367,82 @@
   "retriever": {
     "kind": "RAG · vector store",
     "title": "Stack",
-    "intro": "Mis tecnologías como un espacio de vectores, agrupadas por categoría. Pasa el ratón o enfoca un punto: el retriever te devuelve dónde lo uso.",
-    "queryLabel": "retriever.invoke",
-    "resultsLabel": "documentos recuperados",
-    "empty": "Elige una tecnología para lanzar la consulta.",
-    "sources": {
-      "leads": "Agente de cualificación de leads",
-      "reservas": "Asistente de reservas con IA",
-      "api": "API Infracciones de Tráfico",
-      "ml": "ML Infracciones de Tráfico",
-      "airbnb": "Análisis de precios de Airbnb",
-      "all": "Todos mis proyectos",
-      "bootcamp": "Formación · Bootcamp The Bridge",
-      "pending": "[PENDIENTE]"
-    },
+    "intro": "Las herramientas con las que trabajo, indexadas por categoría.",
     "clusters": [
       {
         "id": "agents",
         "name": "Agentes y LLMs",
         "items": [
-          {
-            "name": "LangGraph",
-            "uses": [
-              "leads",
-              "reservas"
-            ]
-          },
-          {
-            "name": "LangChain",
-            "uses": [
-              "leads",
-              "reservas"
-            ]
-          },
-          {
-            "name": "RAG",
-            "uses": [
-              "reservas"
-            ]
-          },
-          {
-            "name": "Chroma",
-            "uses": [
-              "reservas"
-            ]
-          },
-          {
-            "name": "OpenAI API",
-            "uses": [
-              "leads",
-              "reservas"
-            ]
-          }
+          "LangGraph",
+          "LangChain",
+          "RAG",
+          "Chroma",
+          "OpenAI API"
         ]
       },
       {
         "id": "data",
         "name": "Datos y ML",
         "items": [
-          {
-            "name": "Python",
-            "uses": [
-              "all"
-            ]
-          },
-          {
-            "name": "Pandas",
-            "uses": [
-              "ml",
-              "airbnb"
-            ]
-          },
-          {
-            "name": "NumPy",
-            "uses": [
-              "airbnb"
-            ]
-          },
-          {
-            "name": "Scikit-learn",
-            "uses": [
-              "ml"
-            ]
-          },
-          {
-            "name": "LightGBM",
-            "uses": [
-              "ml"
-            ]
-          },
-          {
-            "name": "XGBoost",
-            "uses": [
-              "ml"
-            ]
-          },
-          {
-            "name": "SciPy",
-            "uses": [
-              "ml"
-            ]
-          },
-          {
-            "name": "Matplotlib",
-            "uses": [
-              "airbnb"
-            ]
-          },
-          {
-            "name": "Seaborn",
-            "uses": [
-              "airbnb"
-            ]
-          },
-          {
-            "name": "SQL",
-            "uses": [
-              "bootcamp"
-            ]
-          },
-          {
-            "name": "BeautifulSoup",
-            "uses": [
-              "leads"
-            ]
-          }
+          "Python",
+          "Pandas",
+          "NumPy",
+          "Scikit-learn",
+          "LightGBM",
+          "XGBoost",
+          "SciPy",
+          "Matplotlib",
+          "Seaborn",
+          "SQL",
+          "BeautifulSoup"
         ]
       },
       {
         "id": "backend",
         "name": "Backend y despliegue",
         "items": [
-          {
-            "name": "FastAPI",
-            "uses": [
-              "api"
-            ]
-          },
-          {
-            "name": "Pydantic",
-            "uses": [
-              "leads",
-              "api"
-            ]
-          },
-          {
-            "name": "Uvicorn",
-            "uses": [
-              "api"
-            ]
-          },
-          {
-            "name": "Render",
-            "uses": [
-              "api"
-            ]
-          },
-          {
-            "name": "Streamlit",
-            "uses": [
-              "reservas"
-            ]
-          },
-          {
-            "name": "SQLite",
-            "uses": [
-              "reservas"
-            ]
-          },
-          {
-            "name": "Google Calendar API",
-            "uses": [
-              "reservas"
-            ]
-          },
-          {
-            "name": "AWS",
-            "uses": [
-              "bootcamp"
-            ]
-          },
-          {
-            "name": "Git",
-            "uses": [
-              "all"
-            ]
-          },
-          {
-            "name": "Docker",
-            "uses": [
-              "pending"
-            ]
-          },
-          {
-            "name": "Poetry",
-            "uses": [
-              "pending"
-            ]
-          }
+          "FastAPI",
+          "Pydantic",
+          "Uvicorn",
+          "Render",
+          "Streamlit",
+          "SQLite",
+          "Google Calendar API",
+          "AWS",
+          "Git",
+          "Docker",
+          "Poetry"
         ]
       },
       {
         "id": "quality",
         "name": "Calidad y evaluación",
         "items": [
-          {
-            "name": "LangSmith",
-            "uses": [
-              "leads",
-              "reservas"
-            ]
-          },
-          {
-            "name": "Pytest",
-            "uses": [
-              "leads",
-              "reservas"
-            ]
-          }
+          "LangSmith",
+          "Pytest"
         ]
       }
-    ]
+    ],
+    "indexLabel": "vectorstore.index"
   },
   "guardrails": {
     "kind": "reglas de control",
     "title": "Cómo construyo agentes fiables",
-    "intro": "Un agente que funciona en una demo no basta. Estas son decisiones que he tomado en mis propios proyectos para que el LLM sea útil sin fiarse de él a ciegas. Tu mensaje tiene que pasar por todas.",
+    "intro": "Dos reglas que resumen cómo hago que el LLM sea útil sin fiarme de él a ciegas. Tu mensaje tiene que pasar por las dos.",
     "appliesTo": "aplica a",
     "passed": "superada",
     "rules": [
       {
         "id": "extract_then_decide",
         "title": "La IA extrae, el código decide",
-        "desc": "El LLM solo hace lo que hace mejor que el código: entender texto desordenado. La puntuación y la decisión final son reglas en Python con 16 tests: coherentes, explicables y gratuitas.",
-        "agent": "Agente de leads"
-      },
-      {
-        "id": "evidence_not_conclusions",
-        "title": "Pruebas, no conclusiones",
-        "desc": "En vez de preguntar «¿cuántas sedes tiene?», el agente debe copiar literalmente la frase o las direcciones de la web. Si no las encuentra, dice «no aparece» en lugar de deducirlo.",
-        "agent": "Agente de leads"
-      },
-      {
-        "id": "limits_in_code",
-        "title": "Los límites van en el código",
-        "desc": "El límite de páginas no depende de que el modelo obedezca: al alcanzarlo, el código le retira las herramientas (<code>tool_choice=\"none\"</code>). En reservas, el cliente identificado lo fija el código, no el modelo: un «cancela la cita del cliente 3» no tiene efecto.",
+        "desc": "El LLM entiende el texto y copia las pruebas literalmente. La puntuación, los límites (<code>tool_choice=\"none\"</code>), el cliente identificado y las fechas los fija el código, con tests.",
         "agent": "Ambos agentes"
       },
       {
         "id": "measure_before_improving",
         "title": "Medir antes de mejorar",
-        "desc": "Dataset en LangSmith con 35 leads reales, cada respuesta respaldada por una cita de la web de la empresa, y 5 evaluadores separados. Revisando cada fallo en las trazas encontré 4 problemas reales del agente, los corregí y pasé del 90 % al 99 %, comparando experimentos en cada paso.",
-        "agent": "Agente de leads"
-      },
-      {
-        "id": "consistent_data",
-        "title": "Datos consistentes",
-        "desc": "Las reservas usan transacciones de SQLite con <code>BEGIN IMMEDIATE</code> para que dos clientes no se queden el mismo hueco. Google Calendar es un espejo: si Google falla, la reserva se guarda igual y se sincroniza después.",
-        "agent": "Asistente de reservas"
-      },
-      {
-        "id": "no_made_up_dates",
-        "title": "Sin fechas inventadas",
-        "desc": "Un prompt dinámico inyecta en cada mensaje la fecha de Madrid y un calendario de 14 días, para que el modelo traduzca «el viernes» a una fecha real sin hacer cálculos.",
-        "agent": "Asistente de reservas"
+        "desc": "Dataset en LangSmith con 35 leads reales y 5 evaluadores: revisando cada fallo en las trazas pasé del 90 % al 99 %. Y datos consistentes: reservas atómicas en SQLite.",
+        "agent": "Ambos agentes"
       }
     ]
   },
@@ -747,10 +558,6 @@
     "phrase1": {
       "kicker": "agent → state",
       "phrase": "La IA no reemplaza el criterio, lo amplifica."
-    },
-    "phrase2": {
-      "kicker": "guardrails → evaluator",
-      "phrase": "La IA extrae, el código decide."
     }
   },
   "labels": {

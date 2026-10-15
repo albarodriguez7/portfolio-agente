@@ -174,7 +174,6 @@ export function createWorld({ canvas, sections, reduced, lowPower }) {
     jump(t) { tTarget = tNow = t; },
     onFrame: fn => listeners.push(fn),
     memoryCount: u => modules.memory.count(u),
-    highlightTech: name => modules.vectors.highlight(name),
     gatesPassed: () => modules.gates.passed(camera.position.z)
   };
 }
