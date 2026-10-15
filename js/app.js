@@ -13,6 +13,8 @@ const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
 const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
 const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+// Móvil en vertical: pantalla partida (3D arriba, texto en un panel inferior con su propio scroll)
+const paneQuery = window.matchMedia('(max-width: 899px)');
 const lowPower = window.innerWidth < 720 || (navigator.hardwareConcurrency || 8) <= 4;
 const hoverCapable = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
 document.documentElement.classList.toggle('reduced', reduced);
@@ -175,8 +177,8 @@ function bindAnchors() {
     const target = document.getElementById(a.getAttribute('href').slice(1));
     if (!target) return;
     e.preventDefault();
-    const top = target.id === 'main' ? 0 : target.getBoundingClientRect().top + window.scrollY - (target.matches('.scene') ? 0 : 90);
-    window.scrollTo({ top, behavior: reduced ? 'auto' : 'smooth' });
+    const top = target.id === 'main' ? 0 : contentTop(target) - (target.matches('.scene') ? 0 : (usePane() ? 12 : 90));
+    scrollToY(top, true);
     const focusEl = target.matches('section') ? $('h1, h2', target) : target;
     if (focusEl) focusEl.focus({ preventScroll: true });
     history.pushState(null, '', a.getAttribute('href'));
@@ -192,9 +194,28 @@ let lastActive = -1;
 const phraseEls = $$('.scene--phrase').map(el => [el.dataset.scene, $('.phrase', el)]);
 const ramp = (a, b, x) => Math.min(1, Math.max(0, (x - a) / (b - a)));
 
+/* ── Scroll: en escritorio se desplaza la ventana; en móvil, el panel inferior (#main) ── */
+const usePane = () => !!world && paneQuery.matches;
+function scrollState() {
+  if (usePane()) {
+    const m = $('#main');
+    return { y: m.scrollTop, h: m.clientHeight, max: Math.max(1, m.scrollHeight - m.clientHeight) };
+  }
+  return { y: window.scrollY, h: window.innerHeight, max: Math.max(1, document.documentElement.scrollHeight - window.innerHeight) };
+}
+function scrollToY(top, smooth) {
+  const opts = { top, behavior: smooth && !reduced ? 'smooth' : 'auto' };
+  if (usePane()) $('#main').scrollTo(opts); else window.scrollTo(opts);
+}
+// posición de un elemento dentro del contenido que se desplaza
+function contentTop(el) {
+  if (usePane()) { const m = $('#main'); return el.getBoundingClientRect().top - m.getBoundingClientRect().top + m.scrollTop; }
+  return el.getBoundingClientRect().top + window.scrollY;
+}
+
 function scrollProgress() {
-  const max = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
-  return Math.min(1, Math.max(0, window.scrollY / max));
+  const { y, max } = scrollState();
+  return Math.min(1, Math.max(0, y / max));
 }
 
 function onScroll() {
@@ -207,8 +228,8 @@ function onScroll() {
 
 // progreso medido en el centro de la pantalla (qué sección se está leyendo)
 function midProgress() {
-  const max = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
-  return Math.min(1, Math.max(0, (window.scrollY + window.innerHeight * 0.5) / max));
+  const { y, h, max } = scrollState();
+  return Math.min(1, Math.max(0, (y + h * 0.5) / max));
 }
 
 function activeFromScroll() {
@@ -278,7 +299,7 @@ async function boot() {
   if (webglAvailable()) {
     try {
       await Promise.race([document.fonts.ready, new Promise(r => setTimeout(r, 1500))]);
-      world = createWorld({ canvas: $('#world'), sections, reduced, lowPower });
+      world = createWorld({ canvas: $('#world'), sections, reduced, lowPower, scrollMax: () => scrollState().max });
       world.onFrame(updateHud);
       window.__world = world;   // útil para depurar desde la consola
     } catch (e) {
@@ -287,6 +308,7 @@ async function boot() {
     }
   }
   if (!world) document.documentElement.classList.add('no-webgl');
+  document.documentElement.classList.toggle('pane', usePane());
 
   renderAll();
   bindCopy();
@@ -294,16 +316,23 @@ async function boot() {
 
   if (location.hash) {
     const target = document.getElementById(location.hash.slice(1));
-    if (target) window.scrollTo(0, target.offsetTop);
+    if (target) scrollToY(contentTop(target), false);
   }
 
   // si cambia la altura del contenido (textos, idioma, fuentes) se recalculan los tramos de cada escena
   if (world && 'ResizeObserver' in window) {
-    new ResizeObserver(() => { world.journey.layout(); onScroll(); }).observe($('#main'));
+    const ro = new ResizeObserver(() => { world.journey.layout(); onScroll(); });
+    sections.forEach(s => ro.observe(s));
   }
   if (world) world.journey.layout();
 
   window.addEventListener('scroll', onScroll, { passive: true });
+  $('#main').addEventListener('scroll', onScroll, { passive: true });
+  // al girar el móvil o cambiar el ancho, se cambia de modo (ventana ↔ panel)
+  paneQuery.addEventListener('change', () => {
+    document.documentElement.classList.toggle('pane', usePane());
+    if (world) { world.resize(); world.journey.layout(); onScroll(); }
+  });
   window.addEventListener('resize', () => { if (world) { world.resize(); onScroll(); if (reduced) world.renderOnce(); } });
   document.addEventListener('visibilitychange', () => { if (!world) return; if (document.hidden) world.stop(); else world.start(); });
 

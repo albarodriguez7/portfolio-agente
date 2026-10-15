@@ -83,14 +83,14 @@ function catmull(p0, p1, p2, p3, s, out) {
   );
 }
 
-export function createJourney(sectionEls) {
+export function createJourney(sectionEls, scrollMax) {
   let frames = [];     // fotogramas con su t global, ordenados
   let sections = [];   // { el, scene, start, end }
   let cuts = [];       // t de los cortes entre pistas
 
   /* Recalcula los t globales a partir de la maqueta (llamar al redimensionar) */
   function layout() {
-    const max = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+    const max = Math.max(1, scrollMax ? scrollMax() : document.documentElement.scrollHeight - window.innerHeight);
     sections = sectionEls.map(el => {
       const top = el.offsetTop;
       return { el, scene: el.dataset.scene, start: top / max, end: Math.min(1, (top + el.offsetHeight) / max) };

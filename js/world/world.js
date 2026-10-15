@@ -27,7 +27,7 @@ export function webglAvailable() {
   } catch (e) { return false; }
 }
 
-export function createWorld({ canvas, sections, reduced, lowPower }) {
+export function createWorld({ canvas, sections, reduced, lowPower, scrollMax }) {
   /* ── Renderer, escena, cámara ── */
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: !lowPower, powerPreference: 'high-performance' });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, lowPower ? 1.25 : 1.75));
@@ -71,7 +71,7 @@ export function createWorld({ canvas, sections, reduced, lowPower }) {
 
   scene.add(exterior.group, interior);
 
-  const journey = createJourney(sections);
+  const journey = createJourney(sections, scrollMax);
 
   /* ── Tamaño y encuadre ── */
   let width = 1, height = 1;
@@ -91,7 +91,8 @@ export function createWorld({ canvas, sections, reduced, lowPower }) {
   function applyShift(shift) {
     const desktop = width >= 900;
     const ox = desktop ? -shift * width * 0.17 : 0;
-    const oy = desktop ? 0 : shift * height * 0.16;
+    // móvil: la escena se centra en la mitad superior (la inferior es el panel de texto)
+    const oy = desktop ? 0 : height * 0.26;
     camera.setViewOffset(width, height, ox, oy, width, height);
   }
 
