@@ -6,7 +6,7 @@
    4. Interacciones: herramientas, stack ↔ estrellas 3D, copiar email,
       navegación por anclas
    ========================================================================== */
-import { createWorld, webglAvailable } from './world/world.js?v=202610151809';
+import { createWorld, webglAvailable } from './world/world.js?v=202610151820';
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
@@ -238,7 +238,7 @@ function activeFromScroll() {
   return idx;
 }
 
-function updateHud({ t, active, local, flash }) {
+function updateHud({ t, active, local, flash, marks = {} }) {
   $('#flash').style.opacity = flash.toFixed(3);
   $('#hud-step').textContent = String(Math.round(t * 100)).padStart(3, '0');
 
@@ -268,8 +268,8 @@ function updateHud({ t, active, local, flash }) {
   if (world && local) {
     let msgs = 1;
     if ((local.brain || 0) > 0.5) msgs += 1;
-    msgs += world.memoryCount(local.memory || 0);
-    msgs += Math.round((local.workshop || 0) * 5);
+    msgs += (marks.memory || []).filter(m => m > 0.5).length;
+    msgs += (marks.workshop || []).filter(m => m > 0.5).length;
     if ((local['exterior-out'] || 0) > 0) msgs += 1;
     $('#hud-msgs').textContent = msgs;
 
@@ -299,7 +299,13 @@ async function boot() {
   if (webglAvailable()) {
     try {
       await Promise.race([document.fonts.ready, new Promise(r => setTimeout(r, 1500))]);
-      world = createWorld({ canvas: $('#world'), sections, reduced, lowPower, scrollMax: () => scrollState().max });
+      world = createWorld({
+        canvas: $('#world'), sections, reduced, lowPower,
+        scrollMax: () => scrollState().max,
+        anchorY: el => contentTop(el),
+        // línea de lectura: a media pantalla en escritorio; cerca del borde superior del panel en móvil
+        readLine: () => scrollState().h * (usePane() ? 0.3 : 0.5)
+      });
       world.onFrame(updateHud);
       window.__world = world;   // útil para depurar desde la consola
     } catch (e) {

@@ -555,10 +555,6 @@
       "kicker": "tokenizer → embeddings",
       "phrase": "Tu mensaje acaba de entrar en el agente.",
       "sub": "Se parte en tokens, se convierte en vectores y empieza a recorrer el grafo."
-    },
-    "phrase1": {
-      "kicker": "agent → state",
-      "phrase": "La IA no reemplaza el criterio, lo amplifica."
     }
   },
   "labels": {

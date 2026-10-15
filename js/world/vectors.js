@@ -5,7 +5,7 @@
    Pocos elementos y mucho espacio: se lee de un vistazo.
    ========================================================================== */
 import * as THREE from 'three';
-import { C, MONO, neon, neonLine, canvasTexture, starfield, clamp } from './kit.js?v=202610151809';
+import { C, MONO, neon, neonLine, canvasTexture, starfield, clamp } from './kit.js?v=202610151820';
 
 export const VECTORS = { center: new THREE.Vector3(1.3, 2, -342) };
 
@@ -77,9 +77,11 @@ export function createVectors() {
         if (card) draw(card, cl);
       });
     },
-    update(time, { u }) {
-      // la ficha que se está leyendo avanza con el scroll: 0 → 3
-      const pos = clamp((u - 0.12) / 0.62) * (cards.length - 1);
+    update(time, { u, marks = [] }) {
+      // la ficha que se está leyendo: la del último bloque de texto que ha llegado a la zona de lectura
+      const pos = marks.length
+        ? Math.max(0, marks.reduce((acc, m, i) => (m > 0 ? i - 1 + m : acc), -1))
+        : clamp((u - 0.12) / 0.62) * (cards.length - 1);
       cards.forEach((card, i) => {
         const k = clamp(1 - Math.abs(pos - i));             // 1 = ficha que se está leyendo
         const read = pos >= i - 0.5;                          // ya leída o leyéndose

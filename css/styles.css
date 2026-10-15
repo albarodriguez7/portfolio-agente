@@ -207,7 +207,8 @@ html[lang="es"] .lang-toggle [data-l="es"], html[lang="en"] .lang-toggle [data-l
 
 .scene--phrase { height: 190vh; padding: 0; }
 /* del "Sobre mí" a la Formación: transición corta */
-.scene--phrase[data-scene="brain-out"] { height: 120vh; }
+#agent { padding-bottom: 22vh; }
+#state { padding-top: 22vh; }
 .phrase {
   position: sticky; top: 0;
   height: 100vh;
@@ -477,7 +478,8 @@ html.pane .scene { padding: 0 0 38vh; }
 html.pane .scene--hero { padding-top: 0; padding-bottom: 70vh; }
 html.pane .scene--end { padding-top: 0; padding-bottom: 0; min-height: 0; }
 html.pane .scene--phrase { height: 90vh; }
-html.pane .scene--phrase[data-scene="brain-out"] { height: 60vh; }
+html.pane #agent { padding-bottom: 12vh; }
+html.pane #state { padding-top: 0; }
 /* el "rectángulo" de texto es el propio panel: entra desde abajo y sale por arriba */
 html.pane .panel {
   width: 100%;

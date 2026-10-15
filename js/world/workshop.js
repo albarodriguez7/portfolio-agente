@@ -5,7 +5,7 @@
    pasa, la herramienta "se ejecuta": haz de luz y el anillo pasa a verde.
    ========================================================================== */
 import * as THREE from 'three';
-import { C, MONO, solid, neon, neonLine, edges, canvasTexture, screenMesh, wrapText, smooth, gridFloor } from './kit.js?v=202610151809';
+import { C, MONO, solid, neon, neonLine, edges, canvasTexture, screenMesh, wrapText, smooth, gridFloor } from './kit.js?v=202610151820';
 
 export const WORKSHOP = { zStart: -262, zEnd: -312 };
 
@@ -137,10 +137,10 @@ export function createWorkshop() {
     group,
     range: [WORKSHOP.zStart + 14, WORKSHOP.zEnd - 14],
     setContent: build,
-    update(time, { camera }) {
+    update(time, { camera, marks = [] }) {
       stations.forEach((s, i) => {
-        // la herramienta se ejecuta cuando la cámara llega a su altura
-        const k = smooth(s.z + 9, s.z + 2, camera.position.z);
+        // la herramienta se ejecuta cuando su tarjeta llega a la zona de lectura
+        const k = marks.length ? smooth(0, 1, marks[i] ?? 0) : smooth(s.z + 9, s.z + 2, camera.position.z);
         s.icon.rotation.y = time * (0.6 + k * 2.2) + i;
         s.icon.position.y = 2.4 + Math.sin(time * 1.5 + i) * 0.12 + k * 0.3;
         s.ringMat.color.copy(amber).lerp(green, k);

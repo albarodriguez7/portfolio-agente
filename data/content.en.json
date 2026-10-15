@@ -554,10 +554,6 @@
       "kicker": "tokenizer → embeddings",
       "phrase": "Your message has just entered the agent.",
       "sub": "It's split into tokens, turned into vectors and starts travelling through the graph."
-    },
-    "phrase1": {
-      "kicker": "agent → state",
-      "phrase": "AI doesn't replace judgement, it amplifies it."
     }
   },
   "labels": {

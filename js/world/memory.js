@@ -5,7 +5,7 @@
    "checkpoints" que gira lentamente.
    ========================================================================== */
 import * as THREE from 'three';
-import { C, MONO, solid, neon, edges, canvasTexture, roundRect, label, smooth, mulberry } from './kit.js?v=202610151809';
+import { C, MONO, solid, neon, edges, canvasTexture, roundRect, label, smooth, mulberry } from './kit.js?v=202610151820';
 
 export const MEMORY = { center: new THREE.Vector3(0, 0, -236) };
 
@@ -105,11 +105,12 @@ export function createMemory() {
     group,
     range: [MEMORY.center.z + 18, MEMORY.center.z - 16],
     setContent: build,
-    update(time, { u }) {
+    update(time, { u, marks = [] }) {
       const msgs = items.filter(p => !p.userData.base);
       items.forEach(p => {
         const i = msgs.indexOf(p);
-        const k = i < 0 ? 1 : smooth(dropAt(i, msgs.length), dropAt(i, msgs.length) + 0.14, u);
+        // cae justo cuando su párrafo llega a la zona de lectura (o, sin marcas, según el avance)
+        const k = i < 0 ? 1 : marks.length ? smooth(0, 1, marks[i] ?? 0) : smooth(dropAt(i, msgs.length), dropAt(i, msgs.length) + 0.14, u);
         p.position.y = p.userData.restY + (1 - k) * 9;
         p.rotation.y = (1 - k) * 0.6;
         p.userData.mats.forEach(mt => { mt.opacity = k; });

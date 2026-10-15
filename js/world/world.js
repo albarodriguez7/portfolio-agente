@@ -9,16 +9,16 @@ import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 
-import { C, gridFloor, starfield, lerp } from './kit.js?v=202610151809';
-import { createExterior } from './exterior.js?v=202610151809';
-import { createTokenizer } from './tokenizer.js?v=202610151809';
-import { createBrain } from './brain.js?v=202610151809';
-import { createMemory } from './memory.js?v=202610151809';
-import { createWorkshop } from './workshop.js?v=202610151809';
-import { createVectors } from './vectors.js?v=202610151809';
-import { createGates } from './gates.js?v=202610151809';
-import { createControl } from './control.js?v=202610151809';
-import { createJourney } from './journey.js?v=202610151809';
+import { C, gridFloor, starfield, lerp } from './kit.js?v=202610151820';
+import { createExterior } from './exterior.js?v=202610151820';
+import { createTokenizer } from './tokenizer.js?v=202610151820';
+import { createBrain } from './brain.js?v=202610151820';
+import { createMemory } from './memory.js?v=202610151820';
+import { createWorkshop } from './workshop.js?v=202610151820';
+import { createVectors } from './vectors.js?v=202610151820';
+import { createGates } from './gates.js?v=202610151820';
+import { createControl } from './control.js?v=202610151820';
+import { createJourney } from './journey.js?v=202610151820';
 
 export function webglAvailable() {
   try {
@@ -27,7 +27,7 @@ export function webglAvailable() {
   } catch (e) { return false; }
 }
 
-export function createWorld({ canvas, sections, reduced, lowPower, scrollMax }) {
+export function createWorld({ canvas, sections, reduced, lowPower, scrollMax, anchorY, readLine }) {
   /* ── Renderer, escena, cámara ── */
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: !lowPower, powerPreference: 'high-performance' });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, lowPower ? 1.25 : 1.75));
@@ -71,7 +71,7 @@ export function createWorld({ canvas, sections, reduced, lowPower, scrollMax }) 
 
   scene.add(exterior.group, interior);
 
-  const journey = createJourney(sections, scrollMax);
+  const journey = createJourney(sections, { scrollMax, anchorY, readLine });
 
   /* ── Tamaño y encuadre ── */
   let width = 1, height = 1;
@@ -127,7 +127,7 @@ export function createWorld({ canvas, sections, reduced, lowPower, scrollMax }) 
     if (!reduced) clockTime += dt;
 
     // la cámara persigue al scroll con suavidad (independiente de los fps)
-    tNow = reduced ? tTarget : lerp(tNow, tTarget, 1 - Math.exp(-dt * 5.5));
+    tNow = reduced ? tTarget : lerp(tNow, tTarget, 1 - Math.exp(-dt * 9));   // sigue al scroll casi sin retraso
     if (Math.abs(tNow - tTarget) < 1e-5) tNow = tTarget;
 
     const cam = journey.sample(tNow);
@@ -142,6 +142,7 @@ export function createWorld({ canvas, sections, reduced, lowPower, scrollMax }) 
     exterior.group.visible = !inside;
     interior.visible = inside;
     const local = journey.local(tNow);
+    const marks = journey.markProgress(tNow);
     exterior.setMode(local['exterior-out'] > 0 ? 'outro' : 'intro');
     scene.fog.density = inside ? 0.03 : 0.016;
 
@@ -155,11 +156,12 @@ export function createWorld({ canvas, sections, reduced, lowPower, scrollMax }) 
       m.group.visible = near;
       if (!near) return;
       ctx.u = local[sceneFor[name]] ?? 0;
+      ctx.marks = marks[sceneFor[name]] || [];
       m.update(clockTime, ctx);
     });
 
     composer.render();
-    listeners.forEach(fn => fn({ t: tNow, local, flash: journey.flash(tNow), active: journey.activeIndex(tNow), z }));
+    listeners.forEach(fn => fn({ t: tNow, local, marks, flash: journey.flash(tNow), active: journey.activeIndex(tNow), z }));
   }
 
   // escena del HTML que controla cada módulo (para su progreso local)

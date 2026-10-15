@@ -5,7 +5,7 @@
    en el centro, la pantalla final_answer por la que salimos del agente.
    ========================================================================== */
 import * as THREE from 'three';
-import { C, MONO, solid, neon, edges, canvasTexture, screenMesh, roundRect, wrapText, gridFloor, smooth, clamp, mulberry } from './kit.js?v=202610151809';
+import { C, MONO, solid, neon, edges, canvasTexture, screenMesh, roundRect, wrapText, gridFloor, smooth, clamp, mulberry } from './kit.js?v=202610151820';
 
 // La sala se construye en coordenadas propias y se acerca SHIFT metros al pasillo
 const SHIFT = 50;
@@ -111,14 +111,14 @@ export function createControl() {
     ctx.fillStyle = color; ctx.font = `600 ${w > 600 ? 32 : 24}px ${MONO}`; ctx.fillText(title, 24, w > 600 ? 52 : 38);
   };
 
-  function drawChart(ctx, w, h, u) {
+  function drawChart(ctx, w, h, u, mark) {
     const ch = content.evaluator.chart;
     head(ctx, w, 'LangSmith · experiments');
     ctx.fillStyle = ink; ctx.font = `700 38px ${MONO}`;
     wrapText(ctx, ch.title, 24, 112, w - 48, 44);
     const bars = ch.bars;
     bars.forEach((b, i) => {
-      const k = smooth(0.12 + i * 0.22, 0.34 + i * 0.22, u);
+      const k = mark == null ? smooth(0.12 + i * 0.22, 0.34 + i * 0.22, u) : smooth(i * 0.4, i * 0.4 + 0.6, mark);
       const y = 230 + i * 170;
       ctx.fillStyle = dim; ctx.font = `500 28px ${MONO}`; ctx.fillText(b.label, 24, y);
       ctx.fillStyle = '#1c2140'; ctx.fillRect(24, y + 20, w - 200, 60);
@@ -127,17 +127,17 @@ export function createControl() {
       ctx.fillStyle = ink; ctx.font = `700 40px ${MONO}`;
       if (k > 0.05) ctx.fillText(b.display, 24 + (w - 200) * (b.value / 100) * k + 14, y + 64);
     });
-    if (u > 0.6) {
+    if (mark == null ? u > 0.6 : mark > 0.95) {
       ctx.fillStyle = ok; ctx.font = `700 36px ${MONO}`;
       ctx.fillText('↑ ' + ch.delta, 24, h - 40);
     }
   }
 
-  function drawTrace(ctx, w, h, u) {
+  function drawTrace(ctx, w, h, u, marks) {
     const E = content.evaluator;
     head(ctx, w, E.traceRoot);
     E.steps.forEach((s, i) => {
-      const done = u > 0.1 + i * 0.13;
+      const done = marks ? (marks[i] ?? 0) > 0.5 : u > 0.1 + i * 0.13;
       const y = 120 + i * 112;
       ctx.strokeStyle = '#3b3f6b'; ctx.lineWidth = 3;
       ctx.beginPath(); ctx.moveTo(44, y - 60); ctx.lineTo(44, y + 10); ctx.lineTo(70, y + 10); ctx.stroke();
@@ -181,7 +181,7 @@ export function createControl() {
     group,
     range: [-438 + SHIFT, -500 + SHIFT],
     setContent(c) { content = c; drawStatic(); lastDraw = -1; },
-    update(time, { u }) {
+    update(time, { u, marks = [] }) {
       leds.forEach((l, i) => { l.visible = Math.sin(time * (2 + (i % 4)) + i * 2.1) > -0.4; });
       streaks.forEach((s, i) => {
         const z = -440 - ((s.z + 440 - time * s.speed) % 36 + 36) % 36;   // avanzan hacia la pared y vuelven a empezar
@@ -191,8 +191,8 @@ export function createControl() {
       streakMesh.instanceMatrix.needsUpdate = true;
       if (!content || time - lastDraw < 0.11) return;
       lastDraw = time;
-      screens.chart.redraw((ctx, w, h) => drawChart(ctx, w, h, u));
-      screens.trace.redraw((ctx, w, h) => drawTrace(ctx, w, h, u));
+      screens.chart.redraw((ctx, w, h) => drawChart(ctx, w, h, u, marks.length ? marks[marks.length - 1] : null));
+      screens.trace.redraw((ctx, w, h) => drawTrace(ctx, w, h, u, marks.length ? marks : null));
       screens.wave.redraw((ctx, w, h) => {
         head(ctx, w, 'latency · tokens', '#a5f3fc');
         ['#22d3ee', '#a78bfa'].forEach((cl, j) => {

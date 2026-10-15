@@ -4,7 +4,7 @@
    se abren y se vuelven verdes cuando el mensaje (la cámara) las supera.
    ========================================================================== */
 import * as THREE from 'three';
-import { C, solid, neon, edges, label, smooth, gridFloor } from './kit.js?v=202610151809';
+import { C, solid, neon, edges, label, smooth, gridFloor } from './kit.js?v=202610151820';
 
 export const GATES = { zStart: -366, first: -380, step: 14, count: 2 };
 
@@ -85,10 +85,11 @@ export function createGates() {
         g.label = rule.id;
       });
     },
-    update(time, { camera }) {
-      gates.forEach(g => {
-        // se abre al acercarse (entre 9 y 3 metros antes del arco)
-        const k = smooth(g.z + 9, g.z + 3, camera.position.z);
+    update(time, { camera, marks = [] }) {
+      gates.forEach((g, i) => {
+        // se abre cuando su regla llega a la zona de lectura (sin marcas: al acercarse la cámara)
+        const k = marks.length ? smooth(0, 1, marks[i] ?? 0) : smooth(g.z + 9, g.z + 3, camera.position.z);
+        g.open = k;
         g.left.position.x = -k * 2.2;
         g.right.position.x = k * 2.2;
         g.lampMat.color.copy(red).lerp(green, k);
@@ -97,6 +98,6 @@ export function createGates() {
         g.tag.material.color.set(k > 0.5 ? 0xbbf7d0 : 0xffffff);
       });
     },
-    passed(cameraZ) { return gates.filter(g => cameraZ < g.z + 3).length; }
+    passed() { return gates.filter(g => (g.open || 0) > 0.5).length; }
   };
 }
