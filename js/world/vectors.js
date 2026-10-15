@@ -5,7 +5,7 @@
    Pocos elementos y mucho espacio: se lee de un vistazo.
    ========================================================================== */
 import * as THREE from 'three';
-import { C, MONO, neon, neonLine, canvasTexture, starfield, clamp } from './kit.js?v=202610152051';
+import { C, MONO, neon, neonLine, canvasTexture, starfield, clamp } from './kit.js?v=202610152058';
 
 export const VECTORS = { center: new THREE.Vector3(1.3, 2, -342) };
 

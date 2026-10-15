@@ -5,7 +5,7 @@
    pasa, la herramienta "se ejecuta": haz de luz y el anillo pasa a verde.
    ========================================================================== */
 import * as THREE from 'three';
-import { C, MONO, solid, neon, neonLine, edges, canvasTexture, screenMesh, wrapText, smooth, gridFloor } from './kit.js?v=202610152051';
+import { C, MONO, solid, neon, neonLine, edges, canvasTexture, screenMesh, wrapText, smooth, gridFloor } from './kit.js?v=202610152058';
 
 export const WORKSHOP = { zStart: -262, zEnd: -312 };
 

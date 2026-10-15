@@ -8,8 +8,8 @@
    que se disimula atravesando la pantalla con un destello.
    ========================================================================== */
 import * as THREE from 'three';
-import { SCREEN } from './exterior.js?v=202610152051';
-import { CONTROL } from './control.js?v=202610152051';
+import { SCREEN } from './exterior.js?v=202610152058';
+import { CONTROL } from './control.js?v=202610152058';
 
 const v = (x, y, z) => new THREE.Vector3(x, y, z);
 const S = SCREEN;
@@ -35,14 +35,13 @@ export const KEYFRAMES = {
   ],
   /* Desde aquí, los fotogramas se anclan a bloques de texto (at: [selector, índice]):
      la cámara llega a su sitio justo cuando ese texto entra en la zona de lectura. */
-  // estantería de Formación: una parada delante de cada libro, anclada a su texto (ver BOOKS en memory.js)
-  memory: [{ u: 0.0, pos: v(-2.5, 5.4, -206), look: v(1.5, -0.2, -232), shift: 0.6, track: 'in' }]   // sobrevuela el núcleo
-    .concat([['.previous', 0], ['.bootcamp', 0], ['.msg', 0], ['.msg', 1], ['.msg', 2], ['.msg', 3]].map((at, i) => {
-      const [bx, by] = [[-0.7, -0.6], [0.55, -0.55], [-0.2, 1.05], [0.32, 1.07], [0.84, 1.04], [1.8, 1.1]][i];
-      return { at, pos: v(bx - 0.9, by + 0.5, -226), look: v(bx, by, -232), shift: 0.6, track: 'in' };
-    }))
+  // Formación: el cuaderno-notebook; la cámara se acerca poco a poco mientras pasan las páginas
+  memory: [{ u: 0.0, pos: v(-2.5, 5.4, -206), look: v(1.5, 0.3, -232), shift: 0.6, track: 'in' }]   // sobrevuela el núcleo
+    .concat([['.previous', 0], ['.bootcamp', 0], ['.msg', 0], ['.msg', 1], ['.msg', 2], ['.msg', 3]].map((at, i) => (
+      { at, pos: v(1.3 + i * 0.1, 1.75 - i * 0.03, -227.2 - i * 0.15), look: v(1.5 + i * 0.1, 0.4, -232), shift: 0.6, track: 'in' }
+    )))
     .concat([
-      { u: 0.9, pos: v(-3.6, 1.4, -228), look: v(-2.4, 0.6, -242), shift: 0.6, track: 'in' },   // rodea la estantería
+      { u: 0.9, pos: v(-3.6, 1.4, -228), look: v(-2.4, 0.6, -242), shift: 0.6, track: 'in' },   // rodea el cuaderno
       { u: 1.0, pos: v(-3.4, 1.2, -241), look: v(-1, 0, -258), shift: 0.6, track: 'in' }
     ]),
   // una parada por proyecto, delante de su pedestal (ver STATIONS en workshop.js)
