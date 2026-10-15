@@ -9,16 +9,16 @@ import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 
-import { C, gridFloor, starfield, lerp } from './kit.js?v=202610151853';
-import { createExterior } from './exterior.js?v=202610151853';
-import { createTokenizer } from './tokenizer.js?v=202610151853';
-import { createBrain } from './brain.js?v=202610151853';
-import { createMemory } from './memory.js?v=202610151853';
-import { createWorkshop } from './workshop.js?v=202610151853';
-import { createVectors } from './vectors.js?v=202610151853';
-import { createGates } from './gates.js?v=202610151853';
-import { createControl } from './control.js?v=202610151853';
-import { createJourney } from './journey.js?v=202610151853';
+import { C, gridFloor, starfield, lerp } from './kit.js?v=202610151927';
+import { createExterior } from './exterior.js?v=202610151927';
+import { createTokenizer } from './tokenizer.js?v=202610151927';
+import { createBrain } from './brain.js?v=202610151927';
+import { createMemory } from './memory.js?v=202610151927';
+import { createWorkshop } from './workshop.js?v=202610151927';
+import { createVectors } from './vectors.js?v=202610151927';
+import { createGates } from './gates.js?v=202610151927';
+import { createControl } from './control.js?v=202610151927';
+import { createJourney } from './journey.js?v=202610151927';
 
 export function webglAvailable() {
   try {
@@ -43,7 +43,7 @@ export function createWorld({ canvas, sections, reduced, lowPower, scrollMax, an
 
   const composer = new EffectComposer(renderer);
   composer.addPass(new RenderPass(scene, camera));
-  const bloom = new UnrealBloomPass(new THREE.Vector2(256, 256), lowPower ? 0.75 : 0.9, 0.5, 0.62);
+  const bloom = new UnrealBloomPass(new THREE.Vector2(256, 256), lowPower ? 0.35 : 0.42, 0.35, 0.75);   // brillo suave: sin deslumbrar
   composer.addPass(bloom);
   composer.addPass(new OutputPass());
 
@@ -134,7 +134,6 @@ export function createWorld({ canvas, sections, reduced, lowPower, scrollMax, an
     camera.position.copy(cam.pos);
     // móvil: la cámara se acerca un poco a lo que mira (la zona 3D es más pequeña)
     if (paneFrame && cam.track === 'in') camera.position.lerp(cam.look, 0.22);
-    if (!reduced) camera.position.y += Math.sin(clockTime * 0.8) * 0.02;   // leve respiración
     camera.lookAt(cam.look);
     applyShift(cam.shift);
 
@@ -190,7 +189,6 @@ export function createWorld({ canvas, sections, reduced, lowPower, scrollMax, an
     renderOnce() { frame(performance.now()); },
     jump(t) { tTarget = tNow = t; },
     onFrame: fn => listeners.push(fn),
-    memoryCount: u => modules.memory.count(u),
     gatesPassed: () => modules.gates.passed(camera.position.z)
   };
 }

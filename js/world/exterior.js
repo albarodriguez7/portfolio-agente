@@ -4,7 +4,7 @@
    pantalla. Al final salimos por la misma pantalla con la respuesta.
    ========================================================================== */
 import * as THREE from 'three';
-import { C, MONO, solid, neon, edges, canvasTexture, screenMesh, label, roundRect, wrapText, wrapLines, gridFloor, wireMountains, starfield, mulberry } from './kit.js?v=202610151853';
+import { C, MONO, solid, neon, edges, canvasTexture, screenMesh, label, roundRect, wrapText, wrapLines, gridFloor, wireMountains, starfield, mulberry } from './kit.js?v=202610151927';
 
 /* Medidas clave (en metros): la cámara entra justo por SCREEN */
 const DESK_Y = 0.81;
@@ -323,8 +323,8 @@ export function createExterior() {
     update(time) {
       // LEDs que parpadean
       dog.update(time);
-      towerLeds.forEach((l, i) => { l.visible = Math.sin(time * 3 + i * 1.7) > -0.6; });
-      rackLeds.forEach((l, i) => { l.visible = Math.sin(time * (1.5 + (i % 5) * 0.7) + i) > -0.3; });
+      towerLeds.forEach((l, i) => { l.visible = Math.sin(time * 0.5 + i * 1.7) > -0.8; });   // parpadeo lento
+      rackLeds.forEach((l, i) => { l.visible = Math.sin(time * (0.3 + (i % 5) * 0.12) + i) > -0.6; });
       // la pantalla se redibuja ~12 veces por segundo
       if (content && time - lastDraw > 0.08) {
         lastDraw = time;

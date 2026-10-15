@@ -5,7 +5,7 @@
    en el centro, la pantalla final_answer por la que salimos del agente.
    ========================================================================== */
 import * as THREE from 'three';
-import { C, MONO, solid, neon, edges, canvasTexture, screenMesh, roundRect, wrapText, gridFloor, smooth, clamp, mulberry } from './kit.js?v=202610151853';
+import { C, MONO, solid, neon, edges, canvasTexture, screenMesh, roundRect, wrapText, gridFloor, smooth, clamp, mulberry } from './kit.js?v=202610151927';
 
 // La sala se construye en coordenadas propias y se acerca SHIFT metros al pasillo
 const SHIFT = 50;
@@ -176,13 +176,14 @@ export function createControl() {
   }
 
   let lastDraw = -1;
+  let noiseDrawn = false;   // la estática se dibuja una vez (sin parpadeo)
 
   return {
     group,
     range: [-438 + SHIFT, -500 + SHIFT],
     setContent(c) { content = c; drawStatic(); lastDraw = -1; },
     update(time, { u, marks = [] }) {
-      leds.forEach((l, i) => { l.visible = Math.sin(time * (2 + (i % 4)) + i * 2.1) > -0.4; });
+      leds.forEach((l, i) => { l.visible = Math.sin(time * (0.4 + (i % 4) * 0.15) + i * 2.1) > -0.6; });
       streaks.forEach((s, i) => {
         const z = -440 - ((s.z + 440 - time * s.speed) % 36 + 36) % 36;   // avanzan hacia la pared y vuelven a empezar
         m.makeTranslation(s.x, s.y, z);
@@ -211,13 +212,14 @@ export function createControl() {
           ctx.fillText(`run ${s.id.padEnd(14, ' ')} ✓`, 24, 80 + i * 28);
         }
       });
-      screens.noise.redraw((ctx, w, h) => {
+      if (!noiseDrawn) screens.noise.redraw((ctx, w, h) => {
         const img = ctx.createImageData(w, h);
         for (let i = 0; i < img.data.length; i += 4) { const v = Math.random() * 200; img.data[i] = img.data[i + 1] = img.data[i + 2] = v; img.data[i + 3] = 255; }
         ctx.putImageData(img, 0, 0);
         ctx.fillStyle = 'rgba(0,0,0,0.7)'; ctx.fillRect(w / 2 - 90, h / 2 - 24, 180, 48);
         ctx.fillStyle = '#fff'; ctx.font = `700 24px ${MONO}`; ctx.textAlign = 'center'; ctx.fillText('no signal', w / 2, h / 2 + 8); ctx.textAlign = 'left';
       });
+      noiseDrawn = true;
       screens.final.redraw((ctx, w, h) => {
         const pulse = 0.6 + 0.4 * Math.sin(time * 4);
         ctx.fillStyle = '#06261d'; ctx.fillRect(0, 0, w, h);

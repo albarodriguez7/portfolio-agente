@@ -8,8 +8,8 @@
    que se disimula atravesando la pantalla con un destello.
    ========================================================================== */
 import * as THREE from 'three';
-import { SCREEN } from './exterior.js?v=202610151853';
-import { CONTROL } from './control.js?v=202610151853';
+import { SCREEN } from './exterior.js?v=202610151927';
+import { CONTROL } from './control.js?v=202610151927';
 
 const v = (x, y, z) => new THREE.Vector3(x, y, z);
 const S = SCREEN;
@@ -29,19 +29,19 @@ export const KEYFRAMES = {
     { u: 1.0,  pos: v(0, 0.3, -150),  look: v(0, 0, -166),   shift: 0.2, track: 'in' }
   ],
   brain: [
-    { u: 0.3,  pos: v(0.6, 0.5, -166),  look: v(0, 0, -180),  shift: 0.6, track: 'in' },
-    { u: 0.75, pos: v(-0.8, 0.8, -183), look: v(0, 0, -197),  shift: 0.6, track: 'in' },
-    { u: 1.0,  pos: v(1.6, 1.4, -194),  look: v(0, 0, -206),  shift: 0.4, track: 'in' }
+    { u: 0.25, pos: v(0.6, 0.5, -166),  look: v(0, 0, -180),  shift: 0.6, track: 'in' },
+    { u: 0.55, pos: v(-0.8, 0.8, -183), look: v(0, 0, -197),  shift: 0.6, track: 'in' },
+    { u: 0.8,  pos: v(1.6, 1.4, -194),  look: v(0, 0, -206),  shift: 0.4, track: 'in' }
   ],
   /* Desde aquí, los fotogramas se anclan a bloques de texto (at: [selector, índice]):
      la cámara llega a su sitio justo cuando ese texto entra en la zona de lectura. */
-  memory: [
-    { u: 0.0,             pos: v(3.4, 2.2, -207),     look: v(0, 0.5, -236),  shift: 0.6, track: 'in' },   // rodea el núcleo
-    { at: ['.previous', 0], pos: v(0.8, -0.4, -222),  look: v(0, -1.4, -236), shift: 0.6, track: 'in' },
-    { at: ['.msg', 0],     pos: v(0, 0.2, -222.5),    look: v(0, -0.4, -236), shift: 0.6, track: 'in' },
-    { at: ['.msg', -1],    pos: v(-0.6, 1.8, -223),   look: v(0, 0.8, -236),  shift: 0.6, track: 'in' },
-    { u: 1.0,              pos: v(0, 3.2, -226),      look: v(0, 1.2, -250),  shift: 0.6, track: 'in' }
-  ],
+  // historial de checkpoints: una parada por etapa, anclada a su texto (ver CHECKPOINTS_Z en memory.js)
+  memory: [{ u: 0.0, pos: v(-2.5, 5.4, -206), look: v(1.5, -0.5, -219), shift: 0.6, track: 'in' }]   // sobrevuela el núcleo por encima
+    .concat([['.previous', 0], ['.bootcamp', 0], ['.msg', 0], ['.msg', 1], ['.msg', 2], ['.msg', 3]].map((at, i) => {
+      const z = [-216, -223, -230, -237, -244, -251][i];
+      return { at, pos: v(-1.4, 1.5, z + 5.5), look: v(3.2, 0.3, z - 1.2), shift: 0.6, track: 'in' };
+    }))
+    .concat([{ u: 1.0, pos: v(-1.0, 1.2, -258), look: v(0.8, 0, -276), shift: 0.6, track: 'in' }]),
   // una parada por proyecto, delante de su pedestal (ver STATIONS en workshop.js)
   workshop: [0, 1, 2, 3, 4].map(i => {
     const x = i % 2 ? 4.4 : 2.9, z = -274 - i * 8.5;
@@ -86,7 +86,7 @@ function catmull(p0, p1, p2, p3, s, out) {
 }
 
 /* Bloques de texto que disparan las animaciones de cada escena (una marca por bloque) */
-const MARKS = { memory: '.msg', workshop: '.tool', vectors: '.cluster', gates: '.rule', control: '.steps li, .chart' };
+const MARKS = { memory: '.previous, .bootcamp, .msg', workshop: '.tool', vectors: '.cluster', gates: '.rule', control: '.steps li, .chart' };
 
 /* opts: scrollMax() → recorrido total; anchorY(el) → posición del bloque en el contenido;
    readLine() → píxeles desde arriba de la zona visible en los que se "lee" un bloque */
@@ -100,10 +100,13 @@ export function createJourney(sectionEls, opts = {}) {
   /* Recalcula los t globales a partir de la maqueta (llamar al redimensionar) */
   function layout() {
     const max = Math.max(1, scrollMax());
+    // una sección empieza cuando su borde superior llega a la línea de lectura
+    const rl = readLine ? readLine() : 0;
     sections = sectionEls.map(el => {
-      const top = el.offsetTop;
-      return { el, scene: el.dataset.scene, start: top / max, end: Math.min(1, (top + el.offsetHeight) / max) };
+      const top = anchorY ? anchorY(el) : el.offsetTop;
+      return { el, scene: el.dataset.scene, start: Math.max(0, (top - rl) / max), end: Math.min(1, Math.max(0, (top + el.offsetHeight - rl) / max)) };
     });
+    sections[0].start = 0;
     sections[sections.length - 1].end = 1;
     // t en el que un bloque llega a la línea de lectura
     const tOf = el => Math.min(1, Math.max(0, (anchorY(el) - readLine()) / max));
@@ -118,7 +121,11 @@ export function createJourney(sectionEls, opts = {}) {
       });
       if (MARKS[s.scene] && anchorY) marks[s.scene] = Array.from(s.el.querySelectorAll(MARKS[s.scene])).map(tOf);
     });
+    // nunca dos fotogramas en el mismo punto: evita saltos bruscos de cámara
     frames.sort((a, b) => a.t - b.t);
+    for (let i = 1; i < frames.length; i++) {
+      if (frames[i].track === frames[i - 1].track && frames[i].t - frames[i - 1].t < 0.003) frames[i].t = frames[i - 1].t + 0.003;
+    }
     cuts = [];
     for (let i = 1; i < frames.length; i++) if (frames[i].track !== frames[i - 1].track) cuts.push((frames[i].t + frames[i - 1].t) / 2);
   }

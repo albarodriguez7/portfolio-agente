@@ -5,7 +5,7 @@
    Al final, un núcleo que gira: donde se decide la siguiente acción.
    ========================================================================== */
 import * as THREE from 'three';
-import { C, neon, neonLine, label, mulberry } from './kit.js?v=202610151853';
+import { C, neon, neonLine, label, mulberry } from './kit.js?v=202610151927';
 
 export const BRAIN = { zStart: -158, zEnd: -206, core: new THREE.Vector3(0, 0, -206) };
 
@@ -56,12 +56,12 @@ export function createBrain() {
   group.add(new THREE.LineSegments(linkGeo, neonLine(C.grid, 1.2, { transparent: true, opacity: 0.28 })));
 
   /* ── Pulsos de atención viajando por las conexiones ── */
-  const PULSES = 160;
+  const PULSES = 60;
   const pulsePos = new Float32Array(PULSES * 3);
   const pulses = Array.from({ length: PULSES }, () => ({ link: Math.floor(rand() * links.length), t: rand(), speed: 0.4 + rand() * 0.8 }));
   const pulseGeo = new THREE.BufferGeometry();
   pulseGeo.setAttribute('position', new THREE.BufferAttribute(pulsePos, 3));
-  const pulseMat = new THREE.PointsMaterial({ color: new THREE.Color(C.amber).multiplyScalar(2.2), size: 0.16, toneMapped: false, transparent: true, depthWrite: false });
+  const pulseMat = new THREE.PointsMaterial({ color: new THREE.Color(C.amber).multiplyScalar(1.1), size: 0.1, toneMapped: false, transparent: true, depthWrite: false });
   group.add(new THREE.Points(pulseGeo, pulseMat));
 
   /* ── Etiquetas de capa ── */
@@ -118,8 +118,8 @@ export function createBrain() {
 
       // neuronas que se "activan"
       for (let i = 0; i < nodes.length; i++) {
-        const act = 0.5 + 0.5 * Math.sin(time * 2.2 + i * 1.37 + layerOf[i]);
-        col.copy(base[i]).multiplyScalar(0.8 + act * act * 2.2);
+        const act = 0.5 + 0.5 * Math.sin(time * 0.6 + i * 1.37 + layerOf[i]);
+        col.copy(base[i]).multiplyScalar(0.55 + act * 0.25);   // activación tenue y lenta, sin destellos
         nodeMesh.setColorAt(i, col);
       }
       nodeMesh.instanceColor.needsUpdate = true;
@@ -127,7 +127,7 @@ export function createBrain() {
       core.rotation.y = time * 0.35;
       coreWire.rotation.x = time * 0.2;
       ring.rotation.z = time * 0.5;
-      coreLight.intensity = 30 + Math.sin(time * 2) * 10;
+      coreLight.intensity = 18;
     }
   };
 }

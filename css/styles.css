@@ -333,6 +333,33 @@ h3 { font-size: 1.05rem; }
 .now-list li { position: relative; padding-left: 1rem; color: var(--muted); font-size: 0.9rem; }
 .now-list li::before { content: '▸'; position: absolute; left: 0; color: var(--amber); }
 
+/* state: línea de tiempo (historial de checkpoints, como el 3D) */
+#state .previous, #state .bootcamp, #state .msg {
+  position: relative; display: block;
+  margin: 0; padding: 0 0 1.2rem 1.5rem;
+  background: none; border: 0; border-radius: 0;
+  border-left: 2px solid rgba(34, 211, 238, 0.35);
+}
+#state .previous { border-left: 2px dashed rgba(196, 181, 253, 0.55); }     /* la rama de Marketing */
+#state .previous::before, #state .bootcamp::before, #state .msg::before {
+  content: ''; position: absolute; left: -7px; top: 0.3rem;
+  width: 12px; height: 12px; border-radius: 50%;
+  background: var(--bg); border: 2px solid var(--cyan);
+}
+#state .previous::before { border-color: var(--violet); }
+#state .msg.is-highlight::before { background: var(--amber); border-color: var(--amber); }
+#state .msg.is-highlight { border-left-color: transparent; padding-bottom: 0.4rem; }
+#state .msg-list { display: block; margin: 0; }
+#state .msg-idx { display: none; }
+#state .msg-role, #state .previous .msg-role { font: 600 0.72rem var(--font-mono); color: var(--cyan); }
+#state .previous .msg-role { color: var(--violet); }
+#state .msg.is-highlight .msg-role { color: var(--amber); }
+#state .msg.is-highlight .msg-role::after { content: '  HEAD → main'; margin-left: 0.4rem; padding: 0.05rem 0.4rem; border-radius: 4px; background: var(--amber); color: #1a1405; font-weight: 800; }
+#state .previous h3, #state .bootcamp h3, #state .msg h3 { font-size: 1rem; margin: 0.15rem 0 0.2rem; }
+#state .dates code { color: var(--faint); }
+#state .bootcamp p:last-child, #state .msg p:last-child { color: var(--muted); font-size: 0.86rem; }
+#state .bootcamp .dates { margin: 0; }
+
 /* tools */
 .tools-main, .tools-secondary { display: grid; gap: 0.8rem; }
 .tool { display: grid; gap: 0.5rem; padding: 0.9rem; background: var(--panel-2); border: 1px solid var(--line-soft); border-radius: 8px; transition: border-color 0.25s; }

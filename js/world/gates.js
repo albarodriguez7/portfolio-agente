@@ -4,7 +4,7 @@
    se abren y se vuelven verdes cuando el mensaje (la cámara) las supera.
    ========================================================================== */
 import * as THREE from 'three';
-import { C, solid, neon, edges, label, smooth, gridFloor } from './kit.js?v=202610151853';
+import { C, solid, neon, edges, label, smooth, gridFloor } from './kit.js?v=202610151927';
 
 export const GATES = { zStart: -366, first: -380, step: 14, count: 2 };
 
@@ -94,7 +94,7 @@ export function createGates() {
         g.right.position.x = k * 2.2;
         g.lampMat.color.copy(red).lerp(green, k);
         g.laserMat.color.copy(red).lerp(green, k);
-        g.laserMat.opacity = (1 - k * 0.75) * (0.75 + Math.sin(time * 20 + g.z) * 0.15);
+        g.laserMat.opacity = (1 - k * 0.75) * 0.8;
         g.tag.material.color.set(k > 0.5 ? 0xbbf7d0 : 0xffffff);
       });
     },

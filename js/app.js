@@ -6,7 +6,7 @@
    4. Interacciones: herramientas, stack ↔ estrellas 3D, copiar email,
       navegación por anclas
    ========================================================================== */
-import { createWorld, webglAvailable } from './world/world.js?v=202610151853';
+import { createWorld, webglAvailable } from './world/world.js?v=202610151927';
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
@@ -260,7 +260,7 @@ function updateHud({ t, active, local, flash, marks = {} }) {
   if (world && !reduced) {
     phraseEls.forEach(([scene, el]) => {
       const u = local[scene] ?? 0;
-      el.style.opacity = (ramp(0.06, 0.2, u) * (1 - ramp(0.8, 0.95, u))).toFixed(3);
+      el.style.opacity = (ramp(0.06, 0.2, u) * (1 - ramp(0.55, 0.68, u))).toFixed(3);   // se apaga antes de que entre el siguiente texto
     });
   }
 

@@ -1,129 +1,128 @@
 /* ==========================================================================
-   memory.js — La memoria del agente (nodo state)
-   Una torre de archivo: cada etapa de la formación es una placa (un mensaje)
-   que cae y se apila sobre dos escalones base: Marketing y Publicidad y el bootcamp. Alrededor, un anillo de
-   "checkpoints" que gira lentamente.
+   memory.js — La memoria del agente (nodo state) como historial de checkpoints
+   Una línea de luz (la rama principal) con un punto por etapa de la
+   formación y su ficha de cristal al lado. Marketing y Publicidad llega por
+   una rama aparte que se une a la principal en el bootcamp; la etapa actual
+   lleva la etiqueta HEAD. Cada checkpoint se enciende cuando se lee su texto.
    ========================================================================== */
 import * as THREE from 'three';
-import { C, MONO, solid, neon, edges, canvasTexture, roundRect, label, smooth, mulberry } from './kit.js?v=202610151853';
+import { C, MONO, neon, neonLine, canvasTexture, roundRect, smooth, clamp } from './kit.js?v=202610151927';
 
-export const MEMORY = { center: new THREE.Vector3(0, 0, -236) };
+// Profundidad (z) de cada checkpoint: anterior, bootcamp, módulos 1-3 y actualidad
+export const CHECKPOINTS_Z = [-216, -223, -230, -237, -244, -251];
+const LINE_X = 1.4, LINE_Y = -1.2, CARD_X = 3.9, CARD_Y = 0.5;
+const BRANCH_X = 2.8;
+
+export const MEMORY = { center: new THREE.Vector3(1.5, 0, -234) };
 
 export function createMemory() {
   const group = new THREE.Group();
   group.name = 'memory';
-  group.position.copy(MEMORY.center);
-  const rand = mulberry(9);
+  group.add(new THREE.HemisphereLight(0xb7a9ff, 0x0a0614, 0.8));
 
-  /* ── Plataforma y columna central ── */
-  const floor = new THREE.Mesh(new THREE.CylinderGeometry(6, 6.4, 0.5, 8), solid(0x141127));
-  floor.position.y = -2.6;
-  group.add(floor, Object.assign(edges(floor.geometry, C.grid, 1.4), { name: 'floorEdge' }));
-  group.getObjectByName('floorEdge').position.y = -2.6;
+  /* ── Rama principal: tramo apagado + tramo encendido que crece con la lectura ── */
+  const zStart = CHECKPOINTS_Z[1] + 2, zEnd = CHECKPOINTS_Z[5] - 4;
+  const len = zStart - zEnd;
+  const rail = new THREE.Mesh(new THREE.BoxGeometry(0.035, 0.035, len), new THREE.MeshBasicMaterial({ color: 0x2b2550 }));
+  rail.position.set(LINE_X, LINE_Y, (zStart + zEnd) / 2);
+  const lit = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.03, 1), neon(C.cyan, 0.9));
+  lit.position.set(LINE_X, LINE_Y, zStart);
+  group.add(rail, lit);
 
-  const spine = new THREE.Mesh(new THREE.BoxGeometry(0.5, 14, 0.5), neon(C.violet, 1.2));
-  spine.position.set(0, 4.5, -2.1);
-  group.add(spine);
+  /* ── Rama de Marketing que se une a la principal en el bootcamp ── */
+  const branchCurve = new THREE.CatmullRomCurve3([
+    new THREE.Vector3(BRANCH_X, LINE_Y, CHECKPOINTS_Z[0] + 5),
+    new THREE.Vector3(BRANCH_X, LINE_Y, CHECKPOINTS_Z[0]),
+    new THREE.Vector3(BRANCH_X - 0.4, LINE_Y, CHECKPOINTS_Z[0] - 4),
+    new THREE.Vector3(LINE_X, LINE_Y, CHECKPOINTS_Z[1])
+  ]);
+  group.add(new THREE.Mesh(new THREE.TubeGeometry(branchCurve, 40, 0.018, 5, false), neon(C.violet, 0.8)));
 
-  /* ── Anillo de checkpoints (cubos que brillan) ── */
-  const CUBES = 360;
-  const ring = new THREE.InstancedMesh(new THREE.BoxGeometry(0.32, 0.32, 0.32), new THREE.MeshBasicMaterial({ toneMapped: false }), CUBES);
-  const m = new THREE.Matrix4(), col = new THREE.Color();
-  for (let i = 0; i < CUBES; i++) {
-    const a = rand() * Math.PI * 2, r = 17 + rand() * 6, y = -4 + rand() * 16;
-    m.makeTranslation(Math.cos(a) * r, y, Math.sin(a) * r);
-    ring.setMatrixAt(i, m);
-    col.set(rand() > 0.7 ? C.amber : rand() > 0.5 ? C.cyan : C.grid).multiplyScalar(0.35 + rand() * 0.9);
-    ring.setColorAt(i, col);
-  }
-  group.add(ring);
-  const ckLabel = label('checkpoint', { size: 0.4, border: '#fbbf24', color: '#fde68a' });
-  ckLabel.position.set(-7.5, 7, 3);
-  group.add(ckLabel);
+  /* ── Checkpoints: punto + conector + ficha ── */
+  const items = CHECKPOINTS_Z.map((z, i) => {
+    const onBranch = i === 0;
+    const nx = onBranch ? BRANCH_X : LINE_X;
+    const node = new THREE.Mesh(new THREE.IcosahedronGeometry(i === 5 ? 0.2 : 0.14, 1), new THREE.MeshBasicMaterial({ color: 0x3a335e, toneMapped: false }));
+    node.position.set(nx, LINE_Y, z);
+    const conn = new THREE.Line(new THREE.BufferGeometry().setFromPoints([
+      new THREE.Vector3(nx, LINE_Y, z), new THREE.Vector3(CARD_X - 1.6, CARD_Y - 0.4, z)
+    ]), neonLine(C.grid, 0.9, { transparent: true, opacity: 0.4 }));
+    group.add(node, conn);
 
-  group.add(new THREE.HemisphereLight(0xa99bff, 0x0a0614, 0.9));
-  const light = new THREE.PointLight(C.cyan, 25, 25, 1.4);
-  light.position.set(0, 4, 6);
-  group.add(light);
+    const card = new THREE.Group();
+    card.position.set(CARD_X, CARD_Y, z);
+    card.lookAt(-2.5, 1.0, z + 7);                     // mira hacia el pasillo de la cámara
+    const glass = new THREE.Mesh(new THREE.PlaneGeometry(3.2, 1.47), new THREE.MeshBasicMaterial({ color: 0x0a0c1c, transparent: true, opacity: 0.85, side: THREE.DoubleSide }));
+    const tex = canvasTexture(640, 294);
+    const face = new THREE.Mesh(new THREE.PlaneGeometry(3.2, 1.47), new THREE.MeshBasicMaterial({ map: tex.texture, transparent: true, toneMapped: false }));
+    face.position.z = 0.01;
+    const frameMat = neonLine(onBranch ? C.violet : i === 5 ? C.amber : C.cyan, 1.0, { transparent: true });
+    const frame = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.PlaneGeometry(3.2, 1.47)), frameMat);
+    frame.position.z = 0.02;
+    card.add(glass, face, frame);
+    group.add(card);
 
-  /* ── Placas: base (bootcamp) + un mensaje por etapa ── */
-  const plates = new THREE.Group();
-  group.add(plates);
-  let items = [];
+    // Etiqueta HEAD sobre el último checkpoint
+    let head = null;
+    if (i === 5) {
+      const ht = canvasTexture(256, 80, ctx => {
+        ctx.fillStyle = '#fbbf24'; roundRect(ctx, 2, 2, 252, 76, 14); ctx.fill();
+        ctx.fillStyle = '#1a1405'; ctx.font = `800 34px ${MONO}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText('HEAD → main', 128, 42);
+      });
+      head = new THREE.Mesh(new THREE.PlaneGeometry(0.9, 0.28), new THREE.MeshBasicMaterial({ map: ht.texture, transparent: true, toneMapped: false }));
+      head.position.set(-1.05, 0.95, 0.02);
+      card.add(head);
+    }
+    return { z, node, card, tex, face, glass, frameMat, onBranch, head, index: i };
+  });
 
-  // Textura de la cara frontal con las proporciones reales de la placa (sin estirar el texto)
-  function plateTexture(w, h, index, kicker, title, accent) {
-    const cw = 1024, ch = Math.round(cw * h / w);
-    return canvasTexture(cw, ch, ctx => {
-      ctx.fillStyle = accent === 'amber' ? '#1b1236' : '#0e1124';
-      ctx.fillRect(0, 0, cw, ch);
-      ctx.fillStyle = { amber: '#fbbf24', cyan: '#22d3ee', violet: '#a78bfa' }[accent];
-      ctx.fillRect(0, 0, 10, ch);
-      ctx.font = `500 ${Math.round(ch * 0.24)}px ${MONO}`;
-      ctx.fillStyle = '#8b93b8';
-      ctx.fillText(index, 34, ch * 0.38);
-      ctx.fillStyle = { amber: '#fde68a', cyan: '#a5f3fc', violet: '#c4b5fd' }[accent];
-      ctx.fillText(kicker, 34 + Math.round(ch * 0.24) * 3.2, ch * 0.38);
-      ctx.font = `700 ${Math.round(ch * 0.4)}px ${MONO}`;
+  const dim = new THREE.Color(0x3a335e);
+  const on = { branch: new THREE.Color(C.violet).multiplyScalar(1.3), main: new THREE.Color(C.cyan).multiplyScalar(1.3), head: new THREE.Color(C.amber).multiplyScalar(1.4) };
+
+  function draw(item, kicker, title, foot) {
+    const accent = item.onBranch ? '#c4b5fd' : item.index === 5 ? '#fcd34d' : '#67e8f9';
+    item.tex.redraw((ctx, w, h) => {
+      ctx.fillStyle = accent;
+      ctx.font = `600 26px ${MONO}`;
+      ctx.fillText(kicker, 30, 74, w - 60);
       ctx.fillStyle = '#f5f3ff';
-      ctx.fillText(title, 34 + Math.round(ch * 0.24) * 3.2, ch * 0.82, cw - 200);
+      ctx.font = `800 40px ${MONO}`;
+      ctx.fillText(title, 30, 142, w - 60);
+      ctx.fillStyle = '#8c92ad';
+      ctx.font = `500 22px ${MONO}`;
+      ctx.fillText(foot, 30, h - 34, w - 60);
     });
   }
-
-  function build(c) {
-    plates.clear();
-    const s = c.state;
-    const plain = html => { const d = document.createElement('div'); d.innerHTML = html; return d.textContent; };
-    // Dos escalones grandes e iguales (Marketing y Publicidad + Bootcamp) y, encima, un mensaje por etapa
-    const defs = [
-      { idx: 'base', kicker: s.previous.dates, title: plain(s.previous.name), base: true, accent: 'cyan' },
-      { idx: 'base', kicker: 'The Bridge · ' + s.bootcamp.dates, title: plain(s.bootcamp.short || s.bootcamp.name), base: true, accent: 'cyan' }
-    ].concat(s.messages.map((msg, i) => ({ idx: `[${i}]`, kicker: plain(msg.role), title: plain(msg.title), accent: msg.highlight ? 'amber' : 'violet' })));
-
-    let y = -2.35;                                   // cara superior de la plataforma
-    items = defs.map(d => {
-      const plate = new THREE.Group();
-      const w = d.base ? 7.4 : 6.4, h = d.base ? 0.85 : 0.62, depth = d.base ? 3.9 : 3.2;
-      const box = new THREE.Mesh(new THREE.BoxGeometry(w, h, depth), solid(d.base ? 0x221a44 : 0x161433));
-      const tex = plateTexture(w * 0.98, h * 0.94, d.idx, d.kicker, d.title, d.accent);
-      const face = new THREE.Mesh(new THREE.PlaneGeometry(w * 0.98, h * 0.94), new THREE.MeshBasicMaterial({ map: tex.texture, toneMapped: false, transparent: true }));
-      face.position.z = depth / 2 + 0.005;
-      const outline = edges(box.geometry, { amber: C.amber, cyan: C.cyan, violet: C.violet }[d.accent], 2);
-      plate.add(box, face, outline);
-      plate.userData = { restY: y + h / 2, base: d.base, mats: [box.material, face.material, outline.material] };
-      plate.userData.mats.forEach(mt => { mt.transparent = true; });
-      y += h + 0.06;
-      plates.add(plate);
-      return plate;
-    });
-  }
-
-  // momento (u) en que cae cada mensaje: los escalones base ya están colocados
-  const dropAt = (i, n) => i / n * 0.8 + 0.05;
 
   return {
     group,
-    range: [MEMORY.center.z + 18, MEMORY.center.z - 16],
-    setContent: build,
-    update(time, { u, marks = [] }) {
-      const msgs = items.filter(p => !p.userData.base);
-      items.forEach(p => {
-        const i = msgs.indexOf(p);
-        // cae justo cuando su párrafo llega a la zona de lectura (o, sin marcas, según el avance)
-        const k = i < 0 ? 1 : marks.length ? smooth(0, 1, marks[i] ?? 0) : smooth(dropAt(i, msgs.length), dropAt(i, msgs.length) + 0.14, u);
-        p.position.y = p.userData.restY + (1 - k) * 9;
-        p.rotation.y = (1 - k) * 0.6;
-        p.userData.mats.forEach(mt => { mt.opacity = k; });
-        p.visible = k > 0.01;
-      });
-      ring.rotation.y = time * 0.05;
+    range: [-205, -258],
+    setContent(c) {
+      const s = c.state;
+      const plain = html => { const d = document.createElement('div'); d.innerHTML = html; return d.textContent; };
+      draw(items[0], plain(s.previous.dates), plain(s.previous.name), 'branch: marketing');
+      draw(items[1], 'The Bridge · ' + plain(s.bootcamp.dates), plain(s.bootcamp.short || s.bootcamp.name), 'merge → main · checkpoint_1');
+      s.messages.slice(0, 4).forEach((m, i) => draw(items[2 + i], plain(m.role), plain(m.title), `checkpoint_${i + 2}`));
     },
-    // cuántos mensajes hay ya en el estado (para el HUD)
-    count(u) {
-      const n = items.filter(p => !p.userData.base).length;
-      let c = 0;
-      for (let i = 0; i < n; i++) if (u >= dropAt(i, n) + 0.1) c++;
-      return c;
+    update(time, { u, marks = [] }) {
+      // progreso de cada checkpoint: sus marcas de lectura (o el avance de la sección)
+      const k = items.map((_, i) => marks.length ? smooth(0, 1, marks[i] ?? 0) : smooth(i / 7, i / 7 + 0.12, u));
+      items.forEach((it, i) => {
+        const v = k[i];
+        it.node.material.color.copy(dim).lerp(it.onBranch ? on.branch : i === 5 ? on.head : on.main, v);
+        it.face.material.opacity = 0.18 + 0.82 * v;
+        it.glass.material.opacity = 0.35 + 0.5 * v;
+        it.frameMat.opacity = 0.2 + 0.8 * v;
+        it.card.position.y = CARD_Y - (1 - v) * 0.25;
+        if (it.head) it.head.material.opacity = v;
+      });
+      // la rama principal se enciende hasta el último checkpoint leído
+      let reach = 0;
+      for (let i = 1; i < items.length; i++) reach = Math.max(reach, (i - 1 + k[i]) / (items.length - 2));
+      const litLen = Math.max(0.001, clamp(reach) * (zStart - CHECKPOINTS_Z[5]));
+      lit.scale.z = litLen;
+      lit.position.z = zStart - litLen / 2;
     }
   };
 }
