@@ -4,7 +4,7 @@
    se abren y se vuelven verdes cuando el mensaje (la cámara) las supera.
    ========================================================================== */
 import * as THREE from 'three';
-import { C, solid, neon, edges, label, smooth, gridFloor } from './kit.js';
+import { C, solid, neon, edges, label, smooth, gridFloor } from './kit.js?v=202610151809';
 
 export const GATES = { zStart: -366, first: -380, step: 14, count: 2 };
 

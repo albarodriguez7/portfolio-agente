@@ -5,7 +5,7 @@
    Al final, un núcleo que gira: donde se decide la siguiente acción.
    ========================================================================== */
 import * as THREE from 'three';
-import { C, neon, neonLine, label, mulberry } from './kit.js';
+import { C, neon, neonLine, label, mulberry } from './kit.js?v=202610151809';
 
 export const BRAIN = { zStart: -158, zEnd: -206, core: new THREE.Vector3(0, 0, -206) };
 

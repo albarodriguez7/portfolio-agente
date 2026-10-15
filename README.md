@@ -63,3 +63,12 @@ python3 -m http.server 8000
 - Hay enlace «Saltar al contenido», todo se puede usar con teclado y el HUD del grafo enfoca el título de cada sección.
 - Con `prefers-reduced-motion`, la cámara no vuela: muestra una imagen fija de cada escena y no hay animaciones.
 - Si el navegador no tiene WebGL, se muestra el contenido sobre un fondo de rejilla.
+
+## Publicar cambios (caché del navegador)
+
+GitHub Pages permite al navegador guardar los archivos 10 minutos. Para que los cambios se vean al momento, todos los CSS/JS/JSON llevan `?v=AAAAMMDDhhmm`. Antes de subir cambios, actualiza esa versión en todos a la vez:
+
+```bash
+V=$(date +%Y%m%d%H%M)
+sed -i -E "s#\?v=[0-9]+#?v=$V#g" index.html js/*.js js/world/*.js
+```

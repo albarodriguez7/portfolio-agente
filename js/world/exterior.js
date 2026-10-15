@@ -4,7 +4,7 @@
    pantalla. Al final salimos por la misma pantalla con la respuesta.
    ========================================================================== */
 import * as THREE from 'three';
-import { C, MONO, solid, neon, edges, canvasTexture, screenMesh, label, roundRect, wrapText, wrapLines, gridFloor, wireMountains, starfield, mulberry } from './kit.js';
+import { C, MONO, solid, neon, edges, canvasTexture, screenMesh, label, roundRect, wrapText, wrapLines, gridFloor, wireMountains, starfield, mulberry } from './kit.js?v=202610151809';
 
 /* Medidas clave (en metros): la cámara entra justo por SCREEN */
 const DESK_Y = 0.81;
