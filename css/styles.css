@@ -469,28 +469,26 @@ html.pane body { overflow: hidden; }
 html.pane main {
   position: fixed; left: 0; right: 0; bottom: 0; top: var(--split);
   overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch;
-  background: rgba(5, 6, 13, 0.96);
-  border-top: 1px solid var(--amber);
-  box-shadow: 0 -14px 30px rgba(0, 0, 0, 0.6);
+  background: transparent;              /* sin texto, se ve el 3D: nunca queda un hueco negro */
+  scrollbar-width: none;
 }
-/* "pestaña" del panel, como una terminal */
-html.pane main::before {
-  content: '~/agent $ scroll ↓';
-  position: sticky; top: 0; z-index: 2; display: block;
-  padding: 0.35rem var(--gutter);
-  background: rgba(5, 6, 13, 0.98);
-  border-bottom: 1px solid var(--line);
-  font: 600 0.68rem var(--font-mono); letter-spacing: 0.08em; color: var(--faint);
-}
-html.pane .scene { padding: 14px var(--gutter) 38vh; }
-html.pane .scene--hero { padding-top: 14px; padding-bottom: 70vh; }
-html.pane .scene--end { padding-top: 14px; padding-bottom: 0; min-height: 0; }
+html.pane main::-webkit-scrollbar { display: none; }
+html.pane .scene { padding: 0 0 38vh; }
+html.pane .scene--hero { padding-top: 0; padding-bottom: 70vh; }
+html.pane .scene--end { padding-top: 0; padding-bottom: 0; min-height: 0; }
 html.pane .scene--phrase { height: 90vh; }
 html.pane .scene--phrase[data-scene="brain-out"] { height: 60vh; }
-html.pane .panel { background: transparent; border: 0; box-shadow: none; backdrop-filter: none; -webkit-backdrop-filter: none; }
-html.pane .panel-bar { padding-left: 0; padding-right: 0; }
-html.pane .panel-body { padding: 1rem 0 1.2rem; }
-html.pane .footer { margin-top: 12vh; }
+/* el "rectángulo" de texto es el propio panel: entra desde abajo y sale por arriba */
+html.pane .panel {
+  width: 100%;
+  background: rgba(5, 6, 13, 0.96);
+  border: 0; border-top: 1px solid var(--amber); border-radius: 0;
+  box-shadow: 0 -12px 28px rgba(0, 0, 0, 0.55), 0 12px 28px rgba(0, 0, 0, 0.55);
+  backdrop-filter: none; -webkit-backdrop-filter: none;
+}
+html.pane .panel-bar { padding: 0.45rem var(--gutter); }
+html.pane .panel-body { padding: 1rem var(--gutter) 1.4rem; }
+html.pane .footer { margin-top: 0; padding: 1.2rem var(--gutter) 2rem; background: rgba(5, 6, 13, 0.96); }
 /* las frases grandes van sobre el 3D (mitad superior) */
 html.pane.js:not(.reduced):not(.no-webgl) .phrase { inset: var(--topbar-h) 0 calc(100% - var(--split)) 0; }
 html.pane .phrase-text { font-size: clamp(1.5rem, 7.4vw, 2.4rem); }

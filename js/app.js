@@ -309,6 +309,7 @@ async function boot() {
   }
   if (!world) document.documentElement.classList.add('no-webgl');
   document.documentElement.classList.toggle('pane', usePane());
+  if (world) world.resize();
 
   renderAll();
   bindCopy();

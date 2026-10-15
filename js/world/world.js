@@ -75,24 +75,36 @@ export function createWorld({ canvas, sections, reduced, lowPower, scrollMax }) 
 
   /* ── Tamaño y encuadre ── */
   let width = 1, height = 1;
+  let paneFrame = null;      // móvil: zona visible del 3D (entre la barra superior y el panel de texto)
   function resize() {
     width = window.innerWidth;
     height = window.innerHeight;
     renderer.setSize(width, height, false);
     composer.setSize(width, height);
     bloom.resolution.set(width / 2, height / 2);
-    camera.aspect = width / height;
-    camera.fov = width < 720 ? 68 : 55;
+    paneFrame = null;
+    if (document.documentElement.classList.contains('pane')) {
+      const top = document.querySelector('.topbar')?.offsetHeight || 0;
+      const split = document.querySelector('main').getBoundingClientRect().top;
+      paneFrame = { top, h: Math.max(120, split - top) };
+    }
+    camera.aspect = paneFrame ? width / paneFrame.h : width / height;
+    camera.fov = paneFrame ? 56 : width < 720 ? 68 : 55;
     camera.updateProjectionMatrix();
     journey.layout();
   }
 
   // Encuadre desplazado: deja hueco al panel (izquierda en escritorio, abajo en móvil)
   function applyShift(shift) {
+    // móvil con pantalla partida: el encuadre completo de la cámara cabe en la zona visible
+    // de arriba (y se prolonga por debajo, detrás del texto)
+    if (paneFrame) {
+      camera.setViewOffset(width, paneFrame.h, 0, -paneFrame.top, width, height);
+      return;
+    }
     const desktop = width >= 900;
     const ox = desktop ? -shift * width * 0.17 : 0;
-    // móvil: la escena se centra en la mitad superior (la inferior es el panel de texto)
-    const oy = desktop ? 0 : height * 0.26;
+    const oy = desktop ? 0 : height * 0.16 * shift;
     camera.setViewOffset(width, height, ox, oy, width, height);
   }
 
@@ -120,6 +132,8 @@ export function createWorld({ canvas, sections, reduced, lowPower, scrollMax }) 
 
     const cam = journey.sample(tNow);
     camera.position.copy(cam.pos);
+    // móvil: la cámara se acerca un poco a lo que mira (la zona 3D es más pequeña)
+    if (paneFrame && cam.track === 'in') camera.position.lerp(cam.look, 0.22);
     if (!reduced) camera.position.y += Math.sin(clockTime * 0.8) * 0.02;   // leve respiración
     camera.lookAt(cam.look);
     applyShift(cam.shift);
