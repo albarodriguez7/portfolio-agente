@@ -12,7 +12,7 @@ Portfolio de **Alba Rodríguez — Junior AI Engineer** en forma de recorrido 3D
 | 2 | Túnel del tokenizador: el mensaje se rompe en tokens | — | Frase |
 | 3 | El LLM por dentro: capas de neuronas y pulsos de atención | `agent` | Sobre mí |
 | 4 | Núcleo de decisión | — | Frase |
-| 5 | Torre de memoria: sobre la base (Marketing y Publicidad) cae cada etapa de la formación como una placa | `state` | Formación |
+| 5 | Torre de memoria: dos escalones base (Marketing y Publicidad y el Bootcamp) y encima cae cada módulo como una placa | `state` | Formación |
 | 6 | Taller: un pedestal por proyecto que se «ejecuta» al pasar | `tools` | Proyectos |
 | 7 | Índice del retriever: 4 fichas de cristal (una por categoría) que un haz lee una a una | `retriever` | Stack |
 | 8 | 2 vallas láser que se abren y se vuelven verdes (resumen de las reglas) | `guardrails` | Principios |
@@ -44,7 +44,7 @@ Todo el texto está en `data/content.es.json` y `data/content.en.json`, con la m
 
 - **Proyectos:** `tools.main` y `tools.secondary`.
 - **Stack:** `retriever.clusters` (una lista de nombres por categoría; aparecen en el panel y en las fichas 3D).
-- **Formación:** `state.previous` (la base de la torre), `state.bootcamp` y `state.messages`.
+- **Formación:** `state.previous` y `state.bootcamp` (los dos escalones base; `bootcamp.short` es el nombre corto de la placa) y `state.messages`.
 - **Principios y proceso:** `guardrails.rules` (una valla por regla) y `evaluator`.
 - **Textos del recorrido:** `screen` (chat del ordenador), `tokens`, `scenes` (frases grandes) y `hud`.
 
