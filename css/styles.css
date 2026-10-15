@@ -201,11 +201,13 @@ html[lang="es"] .lang-toggle [data-l="es"], html[lang="en"] .lang-toggle [data-l
 
 
 /* ───────────────────── 5. Secciones (escenas) y frases ───────────────────── */
-.scene { position: relative; padding: 60vh var(--gutter) 70vh; }
+.scene { position: relative; padding: 50vh var(--gutter) 50vh; }
 .scene--hero { padding-top: calc(var(--topbar-h) + 28px); padding-bottom: 170vh; }
 .scene--end { padding-top: 85vh; padding-bottom: 0; min-height: 100vh; }
 
-.scene--phrase { height: 230vh; padding: 0; }
+.scene--phrase { height: 190vh; padding: 0; }
+/* del "Sobre mí" a la Formación: transición corta */
+.scene--phrase[data-scene="brain-out"] { height: 120vh; }
 .phrase {
   position: sticky; top: 0;
   height: 100vh;
@@ -215,6 +217,8 @@ html[lang="es"] .lang-toggle [data-l="es"], html[lang="en"] .lang-toggle [data-l
   pointer-events: none;
 }
 .phrase .kicker { justify-self: center; }
+/* Con el 3D activo, la frase queda fija en el centro y solo aparece/desaparece (opacidad por JS) */
+html.js:not(.reduced):not(.no-webgl) .phrase { position: fixed; inset: 0; height: auto; z-index: 4; opacity: 0; }
 .phrase-text {
   max-width: 18ch; margin: 0 auto;
   font: 800 clamp(2rem, 7vw, 5.2rem)/1.05 var(--font-mono);
@@ -440,14 +444,13 @@ h3 { font-size: 1.05rem; }
   .topnav { display: flex; }
   .lang-toggle { margin-left: 0; }
   .btn-cta { display: inline-flex; }
-  .phrase { padding-left: 15vw; }
 }
 @media (min-width: 900px) {
   .graph-hud { display: block; }
 }
 @media (max-width: 899px) {
   /* En móvil el 3D va arriba y el texto entra desde abajo */
-  .scene { padding-top: 85vh; }
+  .scene { padding-top: 75vh; }
   .scene--hero { padding-top: 46vh; }
   .panel { background: rgba(8, 9, 20, 0.9); }
 }

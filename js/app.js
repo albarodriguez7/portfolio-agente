@@ -239,7 +239,7 @@ function updateHud({ t, active, local, flash }) {
   if (world && !reduced) {
     phraseEls.forEach(([scene, el]) => {
       const u = local[scene] ?? 0;
-      el.style.opacity = (ramp(0.14, 0.26, u) * (1 - ramp(0.84, 0.96, u))).toFixed(3);
+      el.style.opacity = (ramp(0.06, 0.2, u) * (1 - ramp(0.8, 0.95, u))).toFixed(3);
     });
   }
 

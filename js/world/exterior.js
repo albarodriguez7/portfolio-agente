@@ -4,7 +4,7 @@
    pantalla. Al final salimos por la misma pantalla con la respuesta.
    ========================================================================== */
 import * as THREE from 'three';
-import { C, MONO, solid, neon, edges, canvasTexture, screenMesh, label, roundRect, wrapText, gridFloor, wireMountains, starfield, mulberry } from './kit.js';
+import { C, MONO, solid, neon, edges, canvasTexture, screenMesh, label, roundRect, wrapText, wrapLines, gridFloor, wireMountains, starfield, mulberry } from './kit.js';
 
 /* Medidas clave (en metros): la cámara entra justo por SCREEN */
 const DESK_Y = 0.81;
@@ -186,17 +186,25 @@ export function createExterior() {
     ctx.font = `500 34px ${MONO}`;
     const typed = mode === 'outro' ? s.user : s.user.slice(0, Math.floor(Math.max(0, time - 0.6) * 16));
 
-    // burbuja del usuario (derecha)
+    // burbuja del usuario (derecha): su alto se calcula con el texto completo,
+    // con el mismo margen arriba y abajo
+    const BX = w - 640, BY = 100, BW = 600, PAD = 30, LH = 42;
+    ctx.font = `500 32px ${MONO}`;
+    const fullLines = wrapLines(ctx, s.user, BW - PAD * 2);
+    const typedLines = wrapLines(ctx, typed, BW - PAD * 2);
+    const BH = PAD + 26 + 14 + fullLines.length * LH + PAD - 8;
     if (typed.length) {
       ctx.fillStyle = '#7c3aed';
-      roundRect(ctx, w - 640, 110, 600, 130, 22);
+      roundRect(ctx, BX, BY, BW, BH, 22);
       ctx.fill();
-      ctx.fillStyle = '#f5f3ff';
+      ctx.fillStyle = '#e9d5ff';
       ctx.font = `600 22px ${MONO}`;
-      ctx.fillText('HumanMessage', w - 610, 148);
+      ctx.fillText('HumanMessage', BX + PAD, BY + PAD + 18);
+      ctx.fillStyle = '#f5f3ff';
       ctx.font = `500 32px ${MONO}`;
-      wrapText(ctx, typed, w - 610, 196, 560, 40);
+      typedLines.forEach((ln, i) => ctx.fillText(ln, BX + PAD, BY + PAD + 26 + 14 + 30 + i * LH - 6));
     }
+    const below = BY + BH;
 
     if (mode === 'intro') {
       const doneTyping = typed.length >= s.user.length;
@@ -205,7 +213,7 @@ export function createExterior() {
         ctx.fillStyle = '#22d3ee';
         ctx.font = `500 28px ${MONO}`;
         const dots = '.'.repeat(1 + Math.floor(time * 3) % 3);
-        ctx.fillText(`● ${s.thinking}${dots}`, 40, 320);
+        ctx.fillText(`● ${s.thinking}${dots}`, 40, below + 70);
       }
       // caja de escritura con cursor
       ctx.strokeStyle = '#3b3f6b';
@@ -219,17 +227,18 @@ export function createExterior() {
     } else {
       // respuesta final del agente (izquierda)
       ctx.fillStyle = '#10302a';
-      roundRect(ctx, 40, 280, 760, 270, 22);
+      const AY = below + 40;
+      roundRect(ctx, 40, AY, 760, 270, 22);
       ctx.fill();
       ctx.strokeStyle = '#34d399';
       ctx.lineWidth = 3;
       ctx.stroke();
       ctx.fillStyle = '#34d399';
       ctx.font = `600 22px ${MONO}`;
-      ctx.fillText(s.answerTitle, 70, 322);
+      ctx.fillText(s.answerTitle, 70, AY + 42);
       ctx.fillStyle = '#ecfdf5';
       ctx.font = `600 38px ${MONO}`;
-      const y = wrapText(ctx, s.answer, 70, 380, 700, 48);
+      const y = wrapText(ctx, s.answer, 70, AY + 100, 700, 48);
       ctx.fillStyle = '#a7f3d0';
       ctx.font = `500 26px ${MONO}`;
       ctx.fillText(content.end.email, 70, y + 18);

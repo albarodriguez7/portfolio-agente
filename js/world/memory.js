@@ -1,7 +1,7 @@
 /* ==========================================================================
    memory.js — La memoria del agente (nodo state)
    Una torre de archivo: cada etapa de la formación es una placa (un mensaje)
-   que cae y se apila sobre la base (la etapa anterior: Marketing y Publicidad). Alrededor, un anillo de
+   que cae y se apila sobre dos escalones base: Marketing y Publicidad y el bootcamp. Alrededor, un anillo de
    "checkpoints" que gira lentamente.
    ========================================================================== */
 import * as THREE from 'three';
@@ -51,20 +51,22 @@ export function createMemory() {
   group.add(plates);
   let items = [];
 
-  function plateTexture(index, kicker, title, highlight) {
-    return canvasTexture(1024, 160, (ctx, w, h) => {
-      ctx.fillStyle = highlight ? '#1b1236' : '#0e1124';
-      ctx.fillRect(0, 0, w, h);
-      ctx.fillStyle = highlight ? '#fbbf24' : '#a78bfa';
-      ctx.fillRect(0, 0, 10, h);
-      ctx.font = `500 30px ${MONO}`;
+  // Textura de la cara frontal con las proporciones reales de la placa (sin estirar el texto)
+  function plateTexture(w, h, index, kicker, title, accent) {
+    const cw = 1024, ch = Math.round(cw * h / w);
+    return canvasTexture(cw, ch, ctx => {
+      ctx.fillStyle = accent === 'amber' ? '#1b1236' : '#0e1124';
+      ctx.fillRect(0, 0, cw, ch);
+      ctx.fillStyle = { amber: '#fbbf24', cyan: '#22d3ee', violet: '#a78bfa' }[accent];
+      ctx.fillRect(0, 0, 10, ch);
+      ctx.font = `500 ${Math.round(ch * 0.24)}px ${MONO}`;
       ctx.fillStyle = '#8b93b8';
-      ctx.fillText(index, 34, 62);
-      ctx.fillStyle = highlight ? '#fde68a' : '#c4b5fd';
-      ctx.fillText(kicker, 120, 62);
-      ctx.font = `700 50px ${MONO}`;
+      ctx.fillText(index, 34, ch * 0.38);
+      ctx.fillStyle = { amber: '#fde68a', cyan: '#a5f3fc', violet: '#c4b5fd' }[accent];
+      ctx.fillText(kicker, 34 + Math.round(ch * 0.24) * 3.2, ch * 0.38);
+      ctx.font = `700 ${Math.round(ch * 0.4)}px ${MONO}`;
       ctx.fillStyle = '#f5f3ff';
-      ctx.fillText(title, 120, 122);
+      ctx.fillText(title, 34 + Math.round(ch * 0.24) * 3.2, ch * 0.82, cw - 200);
     });
   }
 
@@ -72,35 +74,42 @@ export function createMemory() {
     plates.clear();
     const s = c.state;
     const plain = html => { const d = document.createElement('div'); d.innerHTML = html; return d.textContent; };
-    // la base es la etapa anterior (Marketing y Publicidad); encima, un mensaje por etapa
-    const defs = [{ idx: 'base', kicker: s.previous.dates, title: plain(s.previous.name), base: true }]
-      .concat(s.messages.map((msg, i) => ({ idx: `[${i}]`, kicker: plain(msg.role), title: plain(msg.title), highlight: msg.highlight })));
+    // Dos escalones grandes e iguales (Marketing y Publicidad + Bootcamp) y, encima, un mensaje por etapa
+    const defs = [
+      { idx: 'base', kicker: s.previous.dates, title: plain(s.previous.name), base: true, accent: 'cyan' },
+      { idx: 'base', kicker: 'The Bridge · ' + s.bootcamp.dates, title: plain(s.bootcamp.short || s.bootcamp.name), base: true, accent: 'cyan' }
+    ].concat(s.messages.map((msg, i) => ({ idx: `[${i}]`, kicker: plain(msg.role), title: plain(msg.title), accent: msg.highlight ? 'amber' : 'violet' })));
 
-    items = defs.map((d, i) => {
+    let y = -2.35;                                   // cara superior de la plataforma
+    items = defs.map(d => {
       const plate = new THREE.Group();
-      const w = d.base ? 7.2 : 6.4, depth = d.base ? 3.8 : 3.2;
-      const box = new THREE.Mesh(new THREE.BoxGeometry(w, 0.62, depth), solid(d.base ? 0x221a44 : 0x161433));
-      const tex = plateTexture(d.idx, d.kicker, d.title, d.highlight);
-      const face = new THREE.Mesh(new THREE.PlaneGeometry(w * 0.98, 0.6), new THREE.MeshBasicMaterial({ map: tex.texture, toneMapped: false, transparent: true }));
+      const w = d.base ? 7.4 : 6.4, h = d.base ? 0.85 : 0.62, depth = d.base ? 3.9 : 3.2;
+      const box = new THREE.Mesh(new THREE.BoxGeometry(w, h, depth), solid(d.base ? 0x221a44 : 0x161433));
+      const tex = plateTexture(w * 0.98, h * 0.94, d.idx, d.kicker, d.title, d.accent);
+      const face = new THREE.Mesh(new THREE.PlaneGeometry(w * 0.98, h * 0.94), new THREE.MeshBasicMaterial({ map: tex.texture, toneMapped: false, transparent: true }));
       face.position.z = depth / 2 + 0.005;
-      const outline = edges(box.geometry, d.highlight ? C.amber : d.base ? C.cyan : C.violet, 2);
+      const outline = edges(box.geometry, { amber: C.amber, cyan: C.cyan, violet: C.violet }[d.accent], 2);
       plate.add(box, face, outline);
-      plate.userData = { restY: -2.05 + i * 0.68, mats: [box.material, face.material, outline.material] };
+      plate.userData = { restY: y + h / 2, base: d.base, mats: [box.material, face.material, outline.material] };
       plate.userData.mats.forEach(mt => { mt.transparent = true; });
+      y += h + 0.06;
       plates.add(plate);
       return plate;
     });
   }
+
+  // momento (u) en que cae cada mensaje: los escalones base ya están colocados
+  const dropAt = (i, n) => i / n * 0.8 + 0.05;
 
   return {
     group,
     range: [MEMORY.center.z + 18, MEMORY.center.z - 16],
     setContent: build,
     update(time, { u }) {
-      // Cada placa cae a su sitio según avanza la sección (la base ya está)
-      const n = items.length;
-      items.forEach((p, i) => {
-        const k = i === 0 ? 1 : smooth((i - 1) / (n - 1) * 0.85, (i - 1) / (n - 1) * 0.85 + 0.16, u);
+      const msgs = items.filter(p => !p.userData.base);
+      items.forEach(p => {
+        const i = msgs.indexOf(p);
+        const k = i < 0 ? 1 : smooth(dropAt(i, msgs.length), dropAt(i, msgs.length) + 0.14, u);
         p.position.y = p.userData.restY + (1 - k) * 9;
         p.rotation.y = (1 - k) * 0.6;
         p.userData.mats.forEach(mt => { mt.opacity = k; });
@@ -110,9 +119,9 @@ export function createMemory() {
     },
     // cuántos mensajes hay ya en el estado (para el HUD)
     count(u) {
-      const n = items.length - 1;
+      const n = items.filter(p => !p.userData.base).length;
       let c = 0;
-      for (let i = 1; i <= n; i++) if (u >= (i - 1) / n * 0.85 + 0.12) c++;
+      for (let i = 0; i < n; i++) if (u >= dropAt(i, n) + 0.1) c++;
       return c;
     }
   };

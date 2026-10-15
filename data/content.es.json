@@ -133,24 +133,25 @@
     "bootcamp": {
       "name": "Bootcamp Data Science e Inteligencia Artificial — The Bridge",
       "dates": "2025 – 2026",
-      "desc": "Formación intensiva basada en proyectos reales, trabajando con Python, Machine Learning y despliegue en producción."
+      "desc": "Formación intensiva basada en proyectos reales, trabajando con Python, Machine Learning y despliegue en producción.",
+      "short": "Bootcamp Data Science e IA"
     },
     "messages": [
       {
         "key": "data_analysis",
-        "role": "Módulo 2 · The Bridge",
+        "role": "Módulo 1 · The Bridge",
         "title": "Data Analysis",
         "desc": "Acceso a datos (archivos, APIs, web scraping), bases de datos SQL e introducción a NoSQL, limpieza y preprocesamiento, EDA, feature engineering y visualización avanzada."
       },
       {
         "key": "machine_learning",
-        "role": "Módulo 3 · The Bridge",
+        "role": "Módulo 2 · The Bridge",
         "title": "Machine Learning",
         "desc": "Aprendizaje supervisado y no supervisado, evaluación de modelos, validación cruzada, redes neuronales (DNN, CNN, RNN), transfer learning, fine-tuning e introducción a IA Generativa."
       },
       {
         "key": "data_science_business",
-        "role": "Módulo 4 · The Bridge",
+        "role": "Módulo 3 · The Bridge",
         "title": "Data Science &amp; Negocio",
         "desc": "Productización y despliegue de modelos, storytelling y comunicación de resultados, construcción de productos de datos orientados al negocio."
       },

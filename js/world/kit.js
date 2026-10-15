@@ -100,6 +100,18 @@ export function roundRect(ctx, x, y, w, h, r) {
   ctx.closePath();
 }
 
+/* Parte un texto en líneas que caben en maxW (con la fuente actual del ctx) */
+export function wrapLines(ctx, text, maxW) {
+  const lines = [];
+  let line = '';
+  for (const word of String(text).split(' ')) {
+    const test = line ? line + ' ' + word : word;
+    if (ctx.measureText(test).width > maxW && line) { lines.push(line); line = word; } else line = test;
+  }
+  if (line) lines.push(line);
+  return lines;
+}
+
 /* Texto con salto de línea automático en un canvas; devuelve la y final */
 export function wrapText(ctx, text, x, y, maxW, lineH) {
   const words = String(text).split(' ');
