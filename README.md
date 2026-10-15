@@ -1,80 +1,65 @@
-# Portfolio · viaje por dentro de un agente de IA
+# Portfolio · un viaje por dentro de un agente de IA
 
-Nueva versión del portfolio de **Alba Rodríguez — Junior AI Engineer**. Quien visita la web es un mensaje (`HumanMessage`) que recorre el grafo de un agente de LangGraph mientras hace scroll. Cada sección es un nodo:
+Portfolio de **Alba Rodríguez — Junior AI Engineer** en forma de recorrido 3D. Quien visita la web escribe una pregunta en el chat de un ordenador («¿Quién es Alba y qué construye?»). Al hacer scroll, la cámara entra por la pantalla y viaja por dentro del agente siguiendo a ese mensaje.
 
-| Nodo | Sección |
-|---|---|
-| `__start__` | Hero: nombre, resumen y cifras clave |
-| `agent` | Sobre mí |
-| `state` | Formación y trayectoria (cada módulo se añade a `state["messages"]`) |
-| `tools` | Proyectos como herramientas (`tool_call` → resultado) |
-| `retriever` | Stack como espacio de vectores |
-| `guardrails` | Cómo construyo agentes fiables |
-| `evaluator` | Cómo trabajo + gráfico 90 % → 99 % |
-| `__end__` | Contacto |
+🌐 https://albarodriguez7.github.io/portfolio-agente/ · Portfolio clásico: https://albarodriguez7.github.io/
 
-Es un sitio estático (HTML + CSS + JavaScript vanilla, sin build ni dependencias).
+## El recorrido
 
-## Estructura
+| # | Escenario 3D | Nodo | Contenido |
+|---|---|---|---|
+| 1 | Escritorio con un ordenador; el visitante escribe en el chat y la cámara entra por la pantalla | `__start__` | Presentación y cifras |
+| 2 | Túnel del tokenizador: el mensaje se rompe en tokens | — | Frase |
+| 3 | El LLM por dentro: capas de neuronas y pulsos de atención | `agent` | Sobre mí |
+| 4 | Núcleo de decisión | — | Frase |
+| 5 | Torre de memoria: cada etapa de la formación cae como una placa | `state` | Formación |
+| 6 | Taller: un pedestal por proyecto que se «ejecuta» al pasar | `tools` | Proyectos |
+| 7 | Galaxia de vectores con las tecnologías como estrellas | `retriever` | Stack |
+| 8 | Arcos láser que se abren y se vuelven verdes | `guardrails` | Principios |
+| 9 | Pasillo con flujos de datos | — | Frase |
+| 10 | Sala de control con monitores tipo LangSmith | `evaluator` | Cómo trabajo |
+| 11 | Salimos por la pantalla con la respuesta del agente | `__end__` | Contacto |
+
+## Tecnología
+
+- **Three.js 0.160**, incluido en `vendor/three/` (sin CDN), con post-procesado *bloom* para el neón.
+- HTML, CSS y JavaScript con módulos ES. No hay paso de compilación y se publica tal cual en GitHub Pages.
+- Todo el 3D está hecho con código (geometrías low-poly y texturas dibujadas en `<canvas>`), sin modelos descargados.
 
 ```
-portfolio-agente/
-├── index.html              Estructura semántica de los nodos
-├── css/styles.css          Variables al principio y una sección comentada por nodo
-├── js/i18n.js              Carga los JSON y cambia ES / EN
-├── js/main.js              Pinta las listas, scroll, mini-mapa, aristas e interacciones
-├── data/content.es.json    Todo el texto en español
-├── data/content.en.json    Todo el texto en inglés
-└── assets/                 favicon.svg y og-image.png
+index.html             Estructura: lienzo 3D fijo + secciones con paneles
+css/styles.css         Interfaz (paneles, HUD, responsive)
+js/i18n.js             Carga data/content.{es,en}.json y cambia ES / EN
+js/app.js              Pinta los paneles, conecta scroll ↔ cámara, HUD e interacciones
+js/world/world.js      Renderer, bloom y bucle de animación
+js/world/journey.js    Recorrido de la cámara: fotogramas clave por escena
+js/world/*.js          Una escena por archivo (exterior, tokenizer, brain, memory,
+                       workshop, vectors, gates, control) + kit.js (piezas comunes)
+data/content.*.json    Todo el texto en español e inglés
 ```
 
 ## Editar el contenido
 
-Todo el texto vive en `data/content.es.json` y `data/content.en.json`, con la **misma estructura** en los dos. No hace falta tocar el HTML:
+Todo el texto está en `data/content.es.json` y `data/content.en.json`, con la misma estructura en los dos. Los paneles **y** las escenas 3D se rellenan desde ahí: las placas de la memoria, las pantallas del taller, las estrellas del stack, los monitores de la sala de control y el chat del ordenador.
 
-- **Cambiar un texto:** edítalo en los dos JSON. Se admite HTML sencillo (`<strong>`, `<code>`).
-- **Añadir un proyecto principal:** copia un objeto de `tools.main` y cambia `id`, `title`, `desc`, `fn`, `params`, `args`, `steps`, `result`, `tags`, `case` y `code`.
-- **Añadir un proyecto secundario:** igual, en `tools.secondary` (`demo` es opcional).
-- **Añadir una tecnología:** añádela a `retriever.clusters[n].items` con `uses`, que es la lista de proyectos donde la usas. Valores posibles: `leads`, `reservas`, `api`, `ml`, `airbnb`, `all`, `bootcamp` o `pending`. Los nombres que se muestran están en `retriever.sources`.
-- **Formación:** `state.bootcamp` y `state.messages`. Cada mensaje aparece en la línea de tiempo y en el `state.json` lateral.
-- **Principios y proceso:** `guardrails.rules` y `evaluator.steps`. Los datos del gráfico están en `evaluator.chart`.
+- **Proyectos:** `tools.main` y `tools.secondary`.
+- **Stack:** `retriever.clusters`. El campo `uses` indica en qué proyectos se usa cada tecnología; `pending` = [PENDIENTE].
+- **Formación:** `state.messages`.
+- **Principios y proceso:** `guardrails.rules` y `evaluator`.
+- **Textos del recorrido:** `screen` (chat del ordenador), `tokens`, `scenes` (frases grandes) y `hud`.
 
-Si algún JSON tiene un error de sintaxis, la página muestra un aviso. Para comprobarlo:
-
-```bash
-python3 -m json.tool data/content.es.json > /dev/null && echo OK
-```
+Para mover la cámara o cambiar el ritmo, edita `KEYFRAMES` en `js/world/journey.js`. Cada escena tiene fotogramas con `u` (0 → 1, el progreso dentro de su sección), posición, punto al que mira y `shift`, que desplaza el encuadre para dejar sitio al panel.
 
 ## Probar en local
-
-Los JSON se cargan con `fetch`, así que hay que usar un servidor (abrir el archivo directamente no funciona):
 
 ```bash
 python3 -m http.server 8000
 # abre http://localhost:8000/
 ```
 
-Para forzar un idioma, añade `?lang=en` o `?lang=es` a la URL.
+## Accesibilidad
 
-## Publicar en GitHub Pages
-
-Este repositorio es independiente del portfolio clásico (`albarodriguez7.github.io`), que no se toca.
-
-1. En GitHub, ve a **Settings → Pages → Build and deployment**.
-2. Elige **Deploy from a branch**, rama `main` y carpeta `/ (root)`.
-3. En un par de minutos estará en `https://albarodriguez7.github.io/portfolio-agente/`.
-
-Los enlaces a los casos de estudio y al CV apuntan al portfolio clásico (`https://albarodriguez7.github.io/…`), y el pie enlaza a esa versión.
-
-Ahora lleva `<meta name="robots" content="noindex">` para que Google no la indexe. Si quieres que aparezca en buscadores, borra esa línea de `index.html`.
-
-## Accesibilidad y rendimiento
-
-- Enlace «Saltar al contenido», HTML semántico, `lang` dinámico y foco visible.
-- Todo se puede usar con teclado:
-  - las tarjetas de herramientas se despliegan con el foco o con su botón;
-  - en el retriever, los puntos se recorren con las flechas;
-  - el mini-mapa enfoca el título del nodo al que lleva.
-- Con `prefers-reduced-motion` no hay animaciones y todo es visible desde el principio.
-- Colores con contraste WCAG AA. El texto más tenue tiene un contraste de 4,6:1 sobre la superficie más clara.
-- Sin dependencias: solo las fuentes Inter y JetBrains Mono de Google Fonts. Los gráficos son SVG y CSS.
+- El contenido es HTML real (el 3D es decorativo, con `aria-hidden`).
+- Hay enlace «Saltar al contenido», todo se puede usar con teclado y el HUD del grafo enfoca el título de cada sección.
+- Con `prefers-reduced-motion`, la cámara no vuela: muestra una imagen fija de cada escena y no hay animaciones.
+- Si el navegador no tiene WebGL, se muestra el contenido sobre un fondo de rejilla.

@@ -7,17 +7,16 @@
 <title>Alba Rodríguez — Junior AI Engineer</title>
 <meta name="description" content="Junior AI Engineer: agentes con LangChain y LangGraph que usan herramientas, RAG y datos reales, medidos con tests y evaluaciones en LangSmith.">
 <meta name="author" content="Alba Rodríguez">
-<meta name="theme-color" content="#0a0e17">
+<meta name="theme-color" content="#05060d">
 <meta name="color-scheme" content="dark">
-<!-- Versión de prueba: no indexar hasta que sustituya a la web publicada (quitar al moverla a la raíz) -->
+<!-- Versión de prueba: quitar esta línea si se quiere que Google la indexe -->
 <meta name="robots" content="noindex">
 <link rel="canonical" href="https://albarodriguez7.github.io/portfolio-agente/">
 
-<!-- Open Graph / Twitter (reutilizadas de la web actual) -->
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://albarodriguez7.github.io/portfolio-agente/">
 <meta property="og:title" content="Alba Rodríguez — Junior AI Engineer">
-<meta property="og:description" content="Agentes de IA con LangChain y LangGraph: herramientas, RAG y evaluación en LangSmith. Proyectos, casos de estudio y código.">
+<meta property="og:description" content="Un viaje por dentro de un agente de IA: herramientas, RAG, guardrails y evaluación en LangSmith.">
 <meta property="og:image" content="https://albarodriguez7.github.io/portfolio-agente/assets/og-image.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -25,270 +24,263 @@
 <meta property="og:locale:alternate" content="en_GB">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Alba Rodríguez — Junior AI Engineer">
-<meta name="twitter:description" content="Agentes de IA con LangChain y LangGraph: herramientas, RAG y evaluación en LangSmith.">
+<meta name="twitter:description" content="Un viaje por dentro de un agente de IA.">
 <meta name="twitter:image" content="https://albarodriguez7.github.io/portfolio-agente/assets/og-image.png">
 
 <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/styles.css">
+
+<!-- Three.js servido desde el propio repositorio (sin CDN) -->
+<script type="importmap">
+  {
+    "imports": {
+      "three": "./vendor/three/three.module.min.js",
+      "three/addons/": "./vendor/three/addons/"
+    }
+  }
+</script>
+<link rel="modulepreload" href="vendor/three/three.module.min.js">
 <script src="js/i18n.js" defer></script>
-<script src="js/main.js" defer></script>
+<script type="module" src="js/app.js"></script>
 </head>
 <body>
 
 <a class="skip-link" href="#main" data-i18n="ui.skip">Saltar al contenido</a>
 
+<!-- ═════════ El mundo 3D (fondo fijo) ═════════ -->
+<canvas id="world" aria-hidden="true"></canvas>
+<div class="vignette" aria-hidden="true"></div>
+<div class="flash" id="flash" aria-hidden="true"></div>
+
+<div class="loader" id="loader" role="status">
+  <code>$ graph.compile()</code>
+  <span data-i18n="hud.loading">Cargando el agente…</span>
+  <span class="loader-bar"><i></i></span>
+</div>
+
 <!-- ═════════ Barra superior ═════════ -->
 <header class="topbar">
-  <a class="brand" href="#start" aria-label="Alba Rodríguez — inicio">AR<span class="brand-cursor" aria-hidden="true">_</span></a>
-  <p class="topbar-node" aria-hidden="true">
-    <span class="topbar-dot"></span><code id="topbar-node">__start__</code>
-    <span class="topbar-count" id="topbar-count">1/8</span>
-  </p>
-  <a class="topbar-link" href="https://albarodriguez7.github.io/casos.html" data-i18n="ui.cases">Casos de estudio</a>
+  <a class="brand" href="#start" aria-label="Alba Rodríguez — inicio">alba<span class="brand-path">:~/agent$</span><span class="brand-cursor" aria-hidden="true"></span></a>
+  <nav class="topnav" aria-label="Secciones">
+    <a href="#tools" data-i18n="nodes.3.label">Proyectos</a>
+    <a href="#retriever" data-i18n="nodes.4.label">Stack</a>
+    <a href="https://albarodriguez7.github.io/casos.html" data-i18n="ui.cases">Casos de estudio</a>
+    <a href="#end" data-i18n="nodes.7.label">Contacto</a>
+  </nav>
   <button class="lang-toggle" id="lang-toggle" type="button" data-i18n-attr="aria-label:ui.langToggle" aria-label="Cambiar idioma / Change language">
     <span data-l="es">ES</span><span aria-hidden="true">/</span><span data-l="en">EN</span>
   </button>
+  <a class="btn btn-cta" href="#end" data-i18n="hero.ctaContact">Contactar</a>
 </header>
 
-<!-- ═════════ Mini-mapa del grafo (lateral en escritorio, barra en móvil) ═════════ -->
-<nav class="minimap" id="minimap" data-i18n-attr="aria-label:ui.minimap" aria-label="Recorrido del mensaje por el grafo del agente">
-  <div class="mm-track" aria-hidden="true"><span class="mm-fill"></span><span class="mm-msg"></span></div>
-  <ol class="mm-list">
-    <li><a class="mm-node" href="#start"><span class="mm-dot" aria-hidden="true"></span><code class="mm-name">__start__</code><span class="mm-label" data-i18n="nodes.0.label">Inicio</span></a></li>
-    <li><a class="mm-node" href="#agent"><span class="mm-dot" aria-hidden="true"></span><code class="mm-name">agent</code><span class="mm-label" data-i18n="nodes.1.label">Sobre mí</span></a></li>
-    <li><a class="mm-node" href="#state"><span class="mm-dot" aria-hidden="true"></span><code class="mm-name">state</code><span class="mm-label" data-i18n="nodes.2.label">Formación</span></a></li>
-    <li><a class="mm-node" href="#tools"><span class="mm-dot" aria-hidden="true"></span><code class="mm-name">tools</code><span class="mm-label" data-i18n="nodes.3.label">Proyectos</span></a></li>
-    <li><a class="mm-node" href="#retriever"><span class="mm-dot" aria-hidden="true"></span><code class="mm-name">retriever</code><span class="mm-label" data-i18n="nodes.4.label">Stack</span></a></li>
-    <li><a class="mm-node" href="#guardrails"><span class="mm-dot" aria-hidden="true"></span><code class="mm-name">guardrails</code><span class="mm-label" data-i18n="nodes.5.label">Principios</span></a></li>
-    <li><a class="mm-node" href="#evaluator"><span class="mm-dot" aria-hidden="true"></span><code class="mm-name">evaluator</code><span class="mm-label" data-i18n="nodes.6.label">Cómo trabajo</span></a></li>
-    <li><a class="mm-node" href="#end"><span class="mm-dot" aria-hidden="true"></span><code class="mm-name">__end__</code><span class="mm-label" data-i18n="nodes.7.label">Contacto</span></a></li>
+<!-- ═════════ HUD: grafo del agente (como el "$ ls" del vídeo) ═════════ -->
+<nav class="graph-hud" id="graph-hud" data-i18n-attr="aria-label:ui.minimap" aria-label="Recorrido del mensaje por el grafo del agente">
+  <p class="hud-title" data-i18n="hud.graph">$ graph.get_graph()</p>
+  <ol>
+    <li><a href="#start" data-node="start">__start__</a></li>
+    <li><a href="#agent" data-node="agent">agent</a></li>
+    <li><a href="#state" data-node="state">state</a></li>
+    <li><a href="#tools" data-node="tools">tools</a></li>
+    <li><a href="#retriever" data-node="retriever">retriever</a></li>
+    <li><a href="#guardrails" data-node="guardrails">guardrails</a></li>
+    <li><a href="#evaluator" data-node="evaluator">evaluator</a></li>
+    <li><a href="#end" data-node="end">__end__</a></li>
   </ol>
 </nav>
 
+<div class="hud-counter" aria-hidden="true">
+  <span class="hud-dot"></span>
+  <code id="hud-node">__start__</code>
+  <span class="hud-sep">·</span>
+  <span data-i18n="hud.step">paso</span> <b id="hud-step">000</b>/100
+  <span class="hud-sep">·</span>
+  <code>messages: <b id="hud-msgs">1</b></code>
+</div>
+
 <main id="main" tabindex="-1">
 
-  <!-- ═════════ 1 · __start__ (Hero) ═════════ -->
-  <section id="start" class="node node--hero" data-node="start" aria-labelledby="start-title">
-    <div class="hero-grid">
-      <div class="hero-main">
-        <div class="node-head">
-          <span class="node-pill"><span class="node-status" aria-hidden="true"></span><code>__start__</code></span>
-          <span class="node-kind" data-i18n="hero.kind">entrada · HumanMessage</span>
-          <span class="node-state" data-status-text></span>
-        </div>
-        <p class="hero-tag" data-i18n="hero.tag">Junior AI Engineer · IA generativa</p>
-        <h1 id="start-title" class="hero-name" tabindex="-1" data-i18n="hero.name">Alba Rodríguez</h1>
-        <p class="hero-summary" data-i18n="hero.summary">Desarrolladora junior de IA generativa con base en Data Science. Construyo agentes con LangChain y LangGraph que usan herramientas, RAG y datos reales, y los <strong>mido</strong> con tests y evaluaciones en LangSmith.</p>
-        <ul class="hero-metrics">
-          <li class="metric"><b data-i18n="hero.metrics.0.value">99 %</b><span data-i18n="hero.metrics.0.label">de acierto en 35 leads reales</span></li>
-          <li class="metric"><b data-i18n="hero.metrics.1.value">0,003 $</b><span data-i18n="hero.metrics.1.label">aprox. por lead cualificado</span></li>
-          <li class="metric"><b data-i18n="hero.metrics.2.value">+100</b><span data-i18n="hero.metrics.2.label">tests automatizados</span></li>
+  <!-- 1 · __start__: el escritorio y el chat -->
+  <section id="start" class="scene scene--hero" data-scene="exterior-in" data-node="start" aria-labelledby="start-title">
+    <div class="panel panel--hero">
+      <div class="panel-bar"><code>alba@agent: ~</code><span>tty1</span></div>
+      <div class="panel-body">
+        <pre class="boot" aria-hidden="true">AGENT/graph v1.0 (langgraph) #0
+nodes = 8 ................... OK
+tools = 5 ................... OK
+guest login: <span class="boot-ok">visitante</span></pre>
+        <p class="kicker" data-i18n="hero.tag">Junior AI Engineer · IA generativa</p>
+        <h1 id="start-title" tabindex="-1"><span>Alba</span> <span>Rodríguez</span></h1>
+        <p class="lead" data-i18n="hero.summary">Desarrolladora junior de IA generativa con base en Data Science. Construyo agentes con LangChain y LangGraph que usan herramientas, RAG y datos reales, y los <strong>mido</strong> con tests y evaluaciones en LangSmith.</p>
+        <ul class="metrics">
+          <li><b data-i18n="hero.metrics.0.value">99 %</b><span data-i18n="hero.metrics.0.label">de acierto en 35 leads reales</span></li>
+          <li><b data-i18n="hero.metrics.1.value">0,003 $</b><span data-i18n="hero.metrics.1.label">aprox. por lead cualificado</span></li>
+          <li><b data-i18n="hero.metrics.2.value">+100</b><span data-i18n="hero.metrics.2.label">tests automatizados</span></li>
         </ul>
         <div class="cta-row">
           <a class="btn btn-primary" href="#tools" data-i18n="hero.ctaProjects">Ver proyectos →</a>
           <a class="btn" href="https://albarodriguez7.github.io/casos.html" data-i18n="hero.ctaCases">Casos de estudio</a>
           <a class="btn" href="#end" data-i18n="hero.ctaContact">Contactar</a>
         </div>
+        <p class="scroll-cue" aria-hidden="true"><span data-i18n="hud.scroll">Desplaza para entrar en la pantalla</span> <span class="cue-arrow">▾</span></p>
       </div>
+    </div>
+  </section>
 
-      <!-- Traza de entrada: el mensaje del visitante llega al grafo -->
-      <aside class="panel trace-panel" aria-label="Trace">
-        <div class="panel-bar">
-          <code data-i18n="hero.traceTitle">trace · run_0001</code>
-          <span class="live-dot" aria-hidden="true"></span>
+  <!-- 2 · tokenizer: frase grande mientras cruzamos el túnel -->
+  <section class="scene scene--phrase" data-scene="tokenizer" data-node="start" aria-label="tokenizer">
+    <div class="phrase">
+      <p class="kicker" data-i18n="scenes.tokenizer.kicker">tokenizer → embeddings</p>
+      <p class="phrase-text" data-i18n="scenes.tokenizer.phrase">Tu mensaje acaba de entrar en el agente.</p>
+      <p class="phrase-sub" data-i18n="scenes.tokenizer.sub"></p>
+    </div>
+  </section>
+
+  <!-- 3 · agent: el LLM (Sobre mí) -->
+  <section id="agent" class="scene" data-scene="brain" data-node="agent" aria-labelledby="agent-title">
+    <div class="panel">
+      <div class="panel-bar"><code>~/agent/agent.py</code><span data-i18n="agent.kind">LLM · call_model</span></div>
+      <div class="panel-body">
+        <p class="kicker"><span class="node-chip">agent</span> <span class="thinking"><span data-i18n="agent.thinking">el LLM está razonando</span><i></i><i></i><i></i></span></p>
+        <h2 id="agent-title" tabindex="-1" data-i18n="agent.title">Sobre mí</h2>
+        <div class="prose" id="agent-body"></div>
+        <div class="cta-row">
+          <a class="btn btn-primary" href="https://albarodriguez7.github.io/CV_Alba_Rodriguez_AI_Engineer.pdf" target="_blank" rel="noopener" data-i18n="agent.cv">Ver CV →</a>
         </div>
-        <ol class="trace" id="hero-trace"></ol>
-        <p class="state-counter">
-          <code><span data-i18n="hero.counterLabel">state["messages"]</span>.length</code>
-          <span class="counter-value"><span id="msg-counter-from" class="counter-from">0</span><span class="counter-arrow" aria-hidden="true">→</span><b id="msg-counter">1</b></span>
-        </p>
-      </aside>
+      </div>
     </div>
-    <p class="scroll-hint" aria-hidden="true"><span data-i18n="hero.scrollHint">Haz scroll: tu mensaje va a recorrer el grafo</span> <span class="scroll-arrow">↓</span></p>
   </section>
 
-  <div class="edge" data-edge="start-agent" aria-hidden="true"></div>
-
-  <!-- ═════════ 2 · agent (Sobre mí) ═════════ -->
-  <section id="agent" class="node" data-node="agent" aria-labelledby="agent-title">
-    <div class="node-head">
-      <span class="node-pill"><span class="node-status" aria-hidden="true"></span><code>agent</code></span>
-      <span class="node-kind" data-i18n="agent.kind">LLM · call_model</span>
-      <span class="node-state" data-status-text></span>
+  <!-- 4 · frase: salimos del cerebro hacia la memoria -->
+  <section class="scene scene--phrase" data-scene="brain-out" data-node="agent" aria-label="agent → state">
+    <div class="phrase">
+      <p class="kicker" data-i18n="scenes.phrase1.kicker">agent → state</p>
+      <p class="phrase-text" data-i18n="scenes.phrase1.phrase">La IA no reemplaza el criterio, lo amplifica.</p>
     </div>
-    <h2 id="agent-title" tabindex="-1" data-i18n="agent.title">Sobre mí</h2>
-    <article class="panel msg-panel">
-      <div class="panel-bar">
-        <span class="role-chip role-ai" data-i18n="agent.role">AIMessage</span>
-        <span class="thinking" id="agent-thinking" aria-hidden="true"><span data-i18n="agent.thinking">el LLM está razonando</span><i></i><i></i><i></i></span>
-      </div>
-      <div class="agent-body reveal" id="agent-body" data-reveal-key="agent-body"></div>
-      <div class="agent-actions">
-        <a class="btn" href="https://albarodriguez7.github.io/CV_Alba_Rodriguez_AI_Engineer.pdf" target="_blank" rel="noopener" data-i18n="agent.cv">Ver CV →</a>
-      </div>
-    </article>
   </section>
 
-  <div class="edge" data-edge="agent-state" aria-hidden="true"></div>
-
-  <!-- ═════════ 3 · state (Formación y trayectoria) ═════════ -->
-  <section id="state" class="node" data-node="state" aria-labelledby="state-title">
-    <div class="node-head">
-      <span class="node-pill"><span class="node-status" aria-hidden="true"></span><code>state</code></span>
-      <span class="node-kind" data-i18n="state.kind">memoria · checkpointer</span>
-      <span class="node-state" data-status-text></span>
-    </div>
-    <h2 id="state-title" tabindex="-1" data-i18n="state.title">Formación y trayectoria</h2>
-    <p class="section-intro" data-i18n="state.intro"></p>
-
-    <div class="state-grid">
-      <div class="state-timeline">
-        <div class="panel bootcamp">
+  <!-- 5 · state: la memoria (Formación) -->
+  <section id="state" class="scene" data-scene="memory" data-node="state" aria-labelledby="state-title">
+    <div class="panel">
+      <div class="panel-bar"><code>~/agent/state.json</code><span data-i18n="state.kind">memoria · checkpointer</span></div>
+      <div class="panel-body">
+        <p class="kicker"><span class="node-chip">state</span></p>
+        <h2 id="state-title" tabindex="-1" data-i18n="state.title">Formación y trayectoria</h2>
+        <p class="lead-sm" data-i18n="state.intro"></p>
+        <div class="bootcamp">
           <h3 data-i18n="state.bootcamp.name">Bootcamp Data Science e Inteligencia Artificial — The Bridge</h3>
-          <p class="bootcamp-dates"><code data-i18n="state.bootcamp.dates">2025 – 2026</code></p>
+          <p class="dates"><code data-i18n="state.bootcamp.dates">2025 – 2026</code></p>
           <p data-i18n="state.bootcamp.desc"></p>
         </div>
-        <p class="list-label"><code data-i18n="state.messagesLabel">state["messages"]</code></p>
-        <ol class="state-msgs" id="state-msgs"></ol>
-      </div>
-
-      <!-- Estado en JSON que se rellena al hacer scroll -->
-      <div class="state-aside">
-        <div class="panel json-panel">
-          <div class="panel-bar">
-            <code data-i18n="state.jsonTitle">state.json</code>
-            <span class="json-count"><code>len(messages)</code> <b id="state-count">0</b></span>
-          </div>
-          <pre class="json" id="state-json" aria-hidden="true"></pre>
-        </div>
-      </div>
-    </div>
-
-    <div class="state-extra">
-      <div class="panel">
-        <p class="list-label"><code data-i18n="state.languagesTitle">state["languages"]</code></p>
+        <ol class="msg-list" id="state-msgs"></ol>
+        <h3 class="sub"><code data-i18n="state.languagesTitle">state["languages"]</code></h3>
         <ul class="lang-list" id="state-langs"></ul>
-      </div>
-      <div class="panel now-panel">
-        <p class="list-label"><code data-i18n="state.nowKey">state["current_task"]</code></p>
-        <h3 data-i18n="state.nowTitle">En qué estoy ahora</h3>
+        <h3 class="sub" data-i18n="state.nowTitle">En qué estoy ahora</h3>
         <ul class="now-list" id="state-now"></ul>
       </div>
     </div>
   </section>
 
-  <div class="edge" data-edge="state-tools" aria-hidden="true"></div>
-
-  <!-- ═════════ 4 · tools (Proyectos) ═════════ -->
-  <section id="tools" class="node" data-node="tools" aria-labelledby="tools-title">
-    <div class="node-head">
-      <span class="node-pill"><span class="node-status" aria-hidden="true"></span><code>tools</code></span>
-      <span class="node-kind" data-i18n="tools.kind">ToolNode</span>
-      <span class="node-state" data-status-text></span>
-    </div>
-    <h2 id="tools-title" tabindex="-1" data-i18n="tools.title">Proyectos con agentes</h2>
-    <p class="section-intro" data-i18n="tools.intro"></p>
-    <div class="tools-main" id="tools-main"></div>
-    <h3 class="sub-heading" data-i18n="tools.secondaryTitle">Herramientas secundarias · Data Science y APIs</h3>
-    <div class="tools-secondary" id="tools-secondary"></div>
-    <p class="footnote" data-i18n="tools.note"></p>
-  </section>
-
-  <div class="edge" data-edge="tools-retriever" aria-hidden="true"></div>
-
-  <!-- ═════════ 5 · retriever (Stack) ═════════ -->
-  <section id="retriever" class="node" data-node="retriever" aria-labelledby="retriever-title">
-    <div class="node-head">
-      <span class="node-pill"><span class="node-status" aria-hidden="true"></span><code>retriever</code></span>
-      <span class="node-kind" data-i18n="retriever.kind">RAG · vector store</span>
-      <span class="node-state" data-status-text></span>
-    </div>
-    <h2 id="retriever-title" tabindex="-1" data-i18n="retriever.title">Stack</h2>
-    <p class="section-intro" data-i18n="retriever.intro"></p>
-    <div class="retriever-grid">
-      <div class="vector-space" id="vector-space" role="group" aria-labelledby="retriever-title"></div>
-      <div class="panel retrieval-panel">
-        <p class="query"><code><span data-i18n="retriever.queryLabel">retriever.invoke</span>(<span class="q-str" id="retrieval-query">…</span>)</code></p>
-        <div id="retrieval-results" aria-live="polite"></div>
+  <!-- 6 · tools: el taller (Proyectos) -->
+  <section id="tools" class="scene" data-scene="workshop" data-node="tools" aria-labelledby="tools-title">
+    <div class="panel panel--wide">
+      <div class="panel-bar"><code>~/agent/tools/</code><span data-i18n="tools.kind">ToolNode</span></div>
+      <div class="panel-body">
+        <p class="kicker"><span class="node-chip">tools</span></p>
+        <h2 id="tools-title" tabindex="-1" data-i18n="tools.title">Proyectos con agentes</h2>
+        <p class="lead-sm" data-i18n="tools.intro"></p>
+        <div class="tools-main" id="tools-main"></div>
+        <h3 class="sub" data-i18n="tools.secondaryTitle">Herramientas secundarias · Data Science y APIs</h3>
+        <div class="tools-secondary" id="tools-secondary"></div>
+        <p class="footnote" data-i18n="tools.note"></p>
       </div>
     </div>
   </section>
 
-  <div class="edge" data-edge="retriever-guardrails" aria-hidden="true"></div>
-
-  <!-- ═════════ 6 · guardrails (Principios) ═════════ -->
-  <section id="guardrails" class="node" data-node="guardrails" aria-labelledby="guardrails-title">
-    <div class="node-head">
-      <span class="node-pill"><span class="node-status" aria-hidden="true"></span><code>guardrails</code></span>
-      <span class="node-kind" data-i18n="guardrails.kind">reglas de control</span>
-      <span class="node-state" data-status-text></span>
-    </div>
-    <h2 id="guardrails-title" tabindex="-1" data-i18n="guardrails.title">Cómo construyo agentes fiables</h2>
-    <p class="section-intro" data-i18n="guardrails.intro"></p>
-    <ol class="gates" id="gates"></ol>
-  </section>
-
-  <div class="edge" data-edge="guardrails-evaluator" aria-hidden="true"></div>
-
-  <!-- ═════════ 7 · evaluator (Cómo trabajo) ═════════ -->
-  <section id="evaluator" class="node" data-node="evaluator" aria-labelledby="evaluator-title">
-    <div class="node-head">
-      <span class="node-pill"><span class="node-status" aria-hidden="true"></span><code>evaluator</code></span>
-      <span class="node-kind" data-i18n="evaluator.kind">LangSmith · evaluación</span>
-      <span class="node-state" data-status-text></span>
-    </div>
-    <h2 id="evaluator-title" tabindex="-1" data-i18n="evaluator.title">Cómo trabajo</h2>
-    <p class="section-intro" data-i18n="evaluator.intro"></p>
-    <div class="eval-grid">
-      <div class="panel trace-tree-panel">
-        <p class="trace-root"><span aria-hidden="true">▾ </span><code data-i18n="evaluator.traceRoot">evaluate(proyecto)</code></p>
-        <ol class="trace-tree" id="eval-steps"></ol>
+  <!-- 7 · retriever: el espacio de vectores (Stack) -->
+  <section id="retriever" class="scene" data-scene="vectors" data-node="retriever" aria-labelledby="retriever-title">
+    <div class="panel">
+      <div class="panel-bar"><code>~/agent/vectorstore</code><span data-i18n="retriever.kind">RAG · vector store</span></div>
+      <div class="panel-body">
+        <p class="kicker"><span class="node-chip">retriever</span></p>
+        <h2 id="retriever-title" tabindex="-1" data-i18n="retriever.title">Stack</h2>
+        <p class="lead-sm" data-i18n="retriever.intro"></p>
+        <div class="stack" id="stack" role="group" aria-labelledby="retriever-title"></div>
+        <div class="retrieval" aria-live="polite">
+          <p class="query"><code><span data-i18n="retriever.queryLabel">retriever.invoke</span>(<span class="q-str" id="retrieval-query">…</span>)</code></p>
+          <div id="retrieval-results"></div>
+        </div>
       </div>
-      <figure class="panel chart" id="eval-chart"></figure>
     </div>
   </section>
 
-  <div class="edge" data-edge="evaluator-end" aria-hidden="true"></div>
-
-  <!-- ═════════ 8 · __end__ (Contacto) ═════════ -->
-  <section id="end" class="node node--end" data-node="end" aria-labelledby="end-title">
-    <div class="node-head">
-      <span class="node-pill"><span class="node-status" aria-hidden="true"></span><code>__end__</code></span>
-      <span class="node-kind" data-i18n="end.kind">respuesta final</span>
-      <span class="node-state" data-status-text></span>
-    </div>
-    <div class="panel end-panel">
-      <p class="end-code"><code><span class="tok-key">tool_choice</span>=<span class="tok-str">"none"</span></code> <span class="end-arrow" aria-hidden="true">→</span> <span data-i18n="end.punchline">Ya no necesito más herramientas. Hablemos.</span></p>
-      <h2 id="end-title" tabindex="-1" data-i18n="end.title">¿Hablamos?</h2>
-      <p class="end-text" data-i18n="end.text">Busco oportunidades como Junior AI Engineer donde construir asistentes y agentes con IA generativa y dar lo mejor de mí desde el primer día. Si tienes un proyecto interesante o una oferta, escríbeme.</p>
-
-      <div class="email-row">
-        <a class="email" id="email-link" href="mailto:albarodriguezperales7@gmail.com">albarodriguezperales7@gmail.com</a>
-        <button class="btn btn-small" id="copy-email" type="button" data-i18n-attr="aria-label:ui.copyLabel" aria-label="Copiar el email al portapapeles"><span data-i18n="ui.copy">Copiar</span></button>
-      </div>
-      <p class="copy-status" id="copy-status" role="status" aria-live="polite"></p>
-
-      <div class="cta-row cta-center">
-        <a class="btn btn-primary" href="mailto:albarodriguezperales7@gmail.com" data-i18n="end.write">Escríbeme ✉</a>
-        <a class="btn" href="https://www.linkedin.com/in/albarodriguezperales/" target="_blank" rel="noopener">LinkedIn ↗</a>
-        <a class="btn" href="https://github.com/albarodriguez7" target="_blank" rel="noopener">GitHub ↗</a>
-        <a class="btn" href="https://albarodriguez7.github.io/CV_Alba_Rodriguez_AI_Engineer.pdf" target="_blank" rel="noopener" data-i18n="end.cvLabel">CV ↗</a>
+  <!-- 8 · guardrails: los arcos de control (Principios) -->
+  <section id="guardrails" class="scene" data-scene="gates" data-node="guardrails" aria-labelledby="guardrails-title">
+    <div class="panel">
+      <div class="panel-bar"><code>~/agent/guardrails.py</code><span data-i18n="guardrails.kind">reglas de control</span></div>
+      <div class="panel-body">
+        <p class="kicker"><span class="node-chip">guardrails</span> <span class="gate-count"><b id="gates-passed">0</b>/6</span></p>
+        <h2 id="guardrails-title" tabindex="-1" data-i18n="guardrails.title">Cómo construyo agentes fiables</h2>
+        <p class="lead-sm" data-i18n="guardrails.intro"></p>
+        <ol class="rules" id="rules"></ol>
       </div>
     </div>
+  </section>
+
+  <!-- 9 · frase: de los guardrails a la sala de evaluación -->
+  <section class="scene scene--phrase" data-scene="gates-out" data-node="guardrails" aria-label="guardrails → evaluator">
+    <div class="phrase">
+      <p class="kicker" data-i18n="scenes.phrase2.kicker">guardrails → evaluator</p>
+      <p class="phrase-text" data-i18n="scenes.phrase2.phrase">La IA extrae, el código decide.</p>
+    </div>
+  </section>
+
+  <!-- 10 · evaluator: la sala de control (Cómo trabajo) -->
+  <section id="evaluator" class="scene" data-scene="control" data-node="evaluator" aria-labelledby="evaluator-title">
+    <div class="panel">
+      <div class="panel-bar"><code>~/agent/evaluate.py</code><span data-i18n="evaluator.kind">LangSmith · evaluación</span></div>
+      <div class="panel-body">
+        <p class="kicker"><span class="node-chip">evaluator</span></p>
+        <h2 id="evaluator-title" tabindex="-1" data-i18n="evaluator.title">Cómo trabajo</h2>
+        <p class="lead-sm" data-i18n="evaluator.intro"></p>
+        <ol class="steps" id="eval-steps"></ol>
+        <figure class="chart" id="eval-chart"></figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- 11 · __end__: salimos por la pantalla (Contacto) -->
+  <section id="end" class="scene scene--end" data-scene="exterior-out" data-node="end" aria-labelledby="end-title">
+    <div class="panel panel--end">
+      <div class="panel-bar"><code>AIMessage · final_answer</code><span>__end__</span></div>
+      <div class="panel-body">
+        <p class="end-code"><code><span class="tok-key">tool_choice</span>=<span class="tok-str">"none"</span></code> <span class="tok-ok">→</span> <span data-i18n="end.punchline">Ya no necesito más herramientas. Hablemos.</span></p>
+        <h2 id="end-title" tabindex="-1" data-i18n="end.title">¿Hablamos?</h2>
+        <p class="lead-sm" data-i18n="end.text">Busco oportunidades como Junior AI Engineer donde construir asistentes y agentes con IA generativa y dar lo mejor de mí desde el primer día. Si tienes un proyecto interesante o una oferta, escríbeme.</p>
+        <div class="email-row">
+          <a class="email" href="mailto:albarodriguezperales7@gmail.com">albarodriguezperales7@gmail.com</a>
+          <button class="btn btn-small" id="copy-email" type="button" data-i18n-attr="aria-label:ui.copyLabel" aria-label="Copiar el email al portapapeles"><span data-i18n="ui.copy">Copiar</span></button>
+        </div>
+        <p class="copy-status" id="copy-status" role="status" aria-live="polite"></p>
+        <div class="cta-row">
+          <a class="btn btn-primary" href="mailto:albarodriguezperales7@gmail.com" data-i18n="end.write">Escríbeme ✉</a>
+          <a class="btn" href="https://www.linkedin.com/in/albarodriguezperales/" target="_blank" rel="noopener">LinkedIn ↗</a>
+          <a class="btn" href="https://github.com/albarodriguez7" target="_blank" rel="noopener">GitHub ↗</a>
+          <a class="btn" href="https://albarodriguez7.github.io/CV_Alba_Rodriguez_AI_Engineer.pdf" target="_blank" rel="noopener" data-i18n="end.cvLabel">CV ↗</a>
+        </div>
+      </div>
+    </div>
+    <footer class="footer">
+      <p data-i18n="footer">Alba Rodríguez · Junior AI Engineer · 2026</p>
+      <p><a href="https://albarodriguez7.github.io/" data-i18n="ui.classic">Versión clásica del portfolio</a> · <a href="https://albarodriguez7.github.io/casos.html" data-i18n="ui.cases">Casos de estudio</a></p>
+    </footer>
   </section>
 </main>
 
-<footer class="footer">
-  <p data-i18n="footer">Alba Rodríguez · Junior AI Engineer · 2026</p>
-  <p><a href="https://albarodriguez7.github.io/" data-i18n="ui.classic">Versión clásica del portfolio</a> · <a href="https://albarodriguez7.github.io/casos.html" data-i18n="ui.cases">Casos de estudio</a></p>
-</footer>
-
 <noscript>
-  <style>.js-only{display:none}</style>
-  <p class="noscript">Esta versión necesita JavaScript para cargar el contenido. Puedes ver la <a href="https://albarodriguez7.github.io/">versión clásica del portfolio</a>.</p>
+  <p class="noscript">Esta web necesita JavaScript. Puedes ver la <a href="https://albarodriguez7.github.io/">versión clásica del portfolio</a>.</p>
 </noscript>
 </body>
 </html>
